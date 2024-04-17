@@ -1,5 +1,7 @@
 package oop.project.cli;
 
+import oop.project.cli.argparser.ArgumentParser;
+import oop.project.cli.argparser.ValidationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -79,7 +81,6 @@ public class ScenariosTests {
 
     @Nested
     class Calc {
-
         @ParameterizedTest
         @MethodSource
         public void testCalc(String name, String command, Object expected) {
@@ -95,12 +96,10 @@ public class ScenariosTests {
                 Arguments.of("Invalid", "calc unknown", null)
             );
         }
-
     }
 
     @Nested
     class Date {
-
         @ParameterizedTest
         @MethodSource
         public void testDate(String name, String command, Object expected) {
@@ -113,17 +112,32 @@ public class ScenariosTests {
                 Arguments.of("Invalid", "date 20240401", null)
             );
         }
-
     }
+
+    @Nested
+    class test {
+        @ParameterizedTest
+        @MethodSource
+        public void testTests(String name, String command, Object expected) {
+            test(command, expected);
+        }
+
+        public static Stream<Arguments> testTests() {
+            return Stream.of(
+
+            );
+        }
+    }
+
 
     private static void test(String command, Object expected) {
         if (expected != null) {
-            var result = Scenarios.parse(command);
+            var result = ArgumentParser.parse(command);
             Assertions.assertEquals(expected, result);
         } else {
             //TODO: Update with your specific Exception class or whatever other
             //error handling model you use to check for specific library issues.
-            Assertions.assertThrows(Exception.class, () -> {
+            Assertions.assertThrows(ValidationException.class, () -> {
                 Scenarios.parse(command);
             });
         }

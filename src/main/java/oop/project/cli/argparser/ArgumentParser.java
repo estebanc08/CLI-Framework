@@ -1,17 +1,15 @@
 package oop.project.cli.argparser;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class ArgumentParser {
     private final String programName;
     public String description;
-    private final HashMap<String, Argument> namespace;
+    private static final ReturnValue namespace = new ReturnValue();
 
     public ArgumentParser(String programName, String description) {
         this.programName = programName;
         this.description = description;
-        this.namespace = new HashMap<>();
     }
 
     /**
@@ -22,7 +20,7 @@ public class ArgumentParser {
      */
     public void addArgument(Argument argument) {
         // TODO: Add some logic for duplicate refs, maybe throw an error?
-        namespace.put(argument.ref, argument);
+        namespace.map.put(argument.ref, argument);
     }
 
     /**
@@ -32,8 +30,9 @@ public class ArgumentParser {
      * @return Argument associated with the string, or {@code null} if none exists.
      */
     public Argument getArgument(String ref) {
-        return namespace.get(ref);
+        return namespace.map.get(ref);
     }
+
 
     // TODO: Better docstring once we figure out how this function is going to work.
     //  When I say "user" here, I mean "developer who is using this parsing library."
@@ -42,23 +41,26 @@ public class ArgumentParser {
     //              Could we not just have everything in the parse() method?
     //              From the user's point of view, nothing would change, since lex and validate
     //              are both private anyway
-    //          - What should this method return? How do we let the user know when something went
-    //              wrong? Do we return a string, maybe an int, or maybe some custom return object?
-    //              Do we catch the validation exceptions, or assume the user can catch those and deal with them
+    //          -  How do we let the user know when something went wrong?
+    //              Do we return a string, maybe an int, or maybe some custom return object?
+    //          -   Do we catch the validation exceptions, or assume the user can catch those and deal with them
     //              how they wish?
-    //          - How do we get input? Do we modify this method signature to take a string, or do we
-    //              actually wait for IO in this method? I think waiting for IO makes the most sense, but
-    //              we would have to properly document that so it doesn't surprise the user.
-    public void parse() {
+    /**
+     * Parses input.
+     *
+     * @param input Full command to be parsed.
+     * @return Argument associated with the string, or {@code null} if none exists.
+     */
+    public static ReturnValue parse(String input) {
         // TODO: Full end-to-end parsing, calling lex and validate
 
-        String input = "todo";  // How do we call user input? Do we pass it into this method...
-                                    // or do we wait for IO here? Which makes more sense?
         try {
             validate(lex(input));
         } catch (ValidationException err) {
             // TODO: Do something with it, tell the user somehow
         }
+
+        return namespace;
     }
 
     /**
@@ -67,9 +69,31 @@ public class ArgumentParser {
      * @param rawArguments Raw arguments - that is, whatever the user input.
      * @return List of tokens, each with values, kinds, and potentially names (if non-positional: empty string if unnamed)
      */
-    private ArrayList<ArgToken> lex(String rawArguments) {
+    private static ArrayList<ArgToken> lex(String rawArguments) {
         // TODO: Lex
-        throw new NotImplementedException("Lexer not implemented");
+
+        ArrayList<String> wordsList = new ArrayList<>();
+        boolean insideQuotes = false;
+        String curr = "";
+        for(int i = 0; i < rawArguments.length(); i++){
+            if(rawArguments.charAt(i) == ' ' && !insideQuotes){
+                wordsList.add(curr);
+                curr = " ";
+            }
+            if(rawArguments.charAt(i) == '"'){
+                insideQuotes = !insideQuotes;
+            }
+        }
+
+        ArrayList<ArgToken> tokens = new ArrayList<>();
+        for(int i = 0; i < wordsList.size(); i++){
+
+        }
+
+
+
+
+       return tokens;
     }
 
     /**
@@ -77,7 +101,7 @@ public class ArgumentParser {
      *  number of args, etc. Throws a validation error if something is awry.
      * @param tokens List of tokens, as generated from lex.
      */
-    private void validate(ArrayList<ArgToken> tokens) throws ValidationException {
+    private static void validate(ArrayList<ArgToken> tokens) throws ValidationException {
         // TODO: Validate
         throw new NotImplementedException("Validator not implemented");
         //throw new ValidationException("TODO: more descriptive error message here");
