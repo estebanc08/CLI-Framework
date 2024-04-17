@@ -215,7 +215,7 @@ public class ScenariosTests {
                     Arguments.of("Correct input no flag", "validate pattern", Map.of("flag", Optional.empty(), "pattern", "pattern")),
                     Arguments.of("Correct input no bracket", "validate --flag=1  pattern", Map.of("flag", new ArrayList<>(List.of(1)), "pattern", "pattern")),
                     Arguments.of("Correct input with flag", "validate --flag=[1 2] pattern",  Map.of("flag", new ArrayList<>(Arrays.asList(1, 2)), "pattern", "pattern")),
-                    Arguments.of("Multiple word patterns", "validate --flag=[1 2] \"pattern of multiple words\"",  Map.of("flag", new ArrayList<>(Arrays.asList(1, 2)), "pattern", "\"pattern of multiple words\""))
+                    Arguments.of("Multiple word patterns", "validate --flag=[1 2] \"pattern of multiple words\"",  Map.of("flag", new ArrayList<>(Arrays.asList(1, 2)), "pattern", "\"pattern of multiple words\"")))
             );
         }
     }
