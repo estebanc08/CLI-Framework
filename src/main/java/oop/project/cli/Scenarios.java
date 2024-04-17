@@ -1,6 +1,9 @@
 package oop.project.cli;
 
+import oop.project.cli.argparser.ValidationException;
+
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -13,7 +16,7 @@ public class Scenarios {
      * structure and requirements you may need to make changes to adapt it to
      * your needs - use whatever is convenient for your design.
      */
-    public static Map<String, Object> parse(String command) {
+    public static Map<String, Object> parse(String command) throws ValidationException {
         //This assumes commands follow a similar structure to unix commands,
         //e.g. `command [arguments...]`. If your project uses a different
         //structure, e.g. Lisp syntax like `(command [arguments...])`, you may
@@ -27,6 +30,7 @@ public class Scenarios {
             case "sqrt" -> sqrt(arguments);
             case "calc" -> calc(arguments);
             case "date" -> date(arguments);
+//            case "validate" -> validate(arguments);
             default -> throw new IllegalArgumentException("Unknown command.");
         };
     }
@@ -96,5 +100,31 @@ public class Scenarios {
     //should have a couple from pain points at least, and likely some others
     //for notable features. This doesn't need to be exhaustive, but this is a
     //good place to test/showcase your functionality in context.
+
+    /**
+     * Takes two <em>named</em> arguments:
+     *  - {@code left: <your decimal type>} (optional)
+     *     - If your project supports default arguments, you could also parse
+     *       this as a non-optional decimal value using a default of 0.0.
+     *  - {@code right: <your decimal type>} (required)
+     */
+//    static  Map<String, Object> validate(String arguments) throws ValidationException {
+//        /**
+//        *    function has following structure
+//        *    validate [--flag=[args]] pattern
+//        */
+//        var args = arguments.split(" ");
+//        if(args.length > 2){
+//            throw new ValidationException("passing in too many arguments");
+//        }
+//        Map<String, Object> res = new HashMap<>();
+//        if(args[0].matches("^--flag=")){
+//            var flagArgs = args[0].replaceFirst("^--flag=", "");
+//            res.put("flag", flagArgs.split("")),
+//        }
+//
+//        return Map.of("flag", "flag", "pattern", "HI");
+//    }
+
 
 }

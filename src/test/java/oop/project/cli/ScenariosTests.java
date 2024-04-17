@@ -1,5 +1,6 @@
 package oop.project.cli;
 
+import oop.project.cli.argparser.ValidationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -7,8 +8,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.time.LocalDate;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class ScenariosTests {
@@ -116,14 +116,125 @@ public class ScenariosTests {
 
     }
 
-    private static void test(String command, Object expected) {
+    @Nested
+    class ValidateNArgs {
+
+        @ParameterizedTest
+        @MethodSource
+        public void testNArgsNone(String name, String command, Object expected) {
+            test(command, expected);
+        }
+
+        public static Stream<Arguments> testNArgsNone() {
+            return Stream.of(
+                    /**this is for validate --flag=[args?] */
+                    Arguments.of("Missing arg without equals", "validate --flag",  Map.of("flag", Optional.empty())),
+                    Arguments.of("Missing arg with and quotations", "validate --flag=\"\"",  Map.of("flag", Optional.empty())),
+                    Arguments.of("Missing arg with and brackets", "validate --flag=[]",  Map.of("flag", Optional.empty())),
+                    Arguments.of("One arg without brackets", "validate --flag=1", null),
+                    Arguments.of("One arg with brackets", "validate --flag=[1]",  null),
+                    Arguments.of("One arg with brackets multiple words", "validate --flag=[\"There are multiple words\"]", null),
+                    Arguments.of("One arg with brackets multiple words", "validate --flag=[\"There are multiple words\" \"another one\"]",  null),
+                    Arguments.of("More than one arg", "validate --flag=[1 2]",  null)
+            );
+        }
+
+
+        @ParameterizedTest
+        @MethodSource
+        public void testNArgsQuestion(String name, String command, Object expected) {
+            test(command, expected);
+        }
+
+        public static Stream<Arguments> testNArgsQuestion() {
+            return Stream.of(
+                    /**this is for validate --flag=[args?] */
+                    Arguments.of("Missing arg without equals", "validate --flag",  Map.of("flag", Optional.empty())),
+                    Arguments.of("Missing arg with and quotations", "validate --flag=\"\"",  Map.of("flag", Optional.empty())),
+                    Arguments.of("Missing arg with and brackets", "validate --flag=[]",  Map.of("flag", Optional.empty())),
+                    Arguments.of("One arg without brackets", "validate --flag=1",  Map.of("flag", new ArrayList<>(List.of(1)))),
+                    Arguments.of("One arg with brackets", "validate --flag=[1]",  Map.of("flag", new ArrayList<>(List.of(1)))),
+                    Arguments.of("One arg with brackets multiple words", "validate --flag=[\"There are multiple words\"]",  Map.of("flag", new ArrayList<>(List.of("There are multiple words")))),
+                    Arguments.of("One arg with brackets multiple words", "validate --flag=[\"There are multiple words\" \"another one\"]",  null),
+                    Arguments.of("More than one arg", "validate --flag=[1 2]",  null)
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource
+        public void testNArgsPlus(String name, String command, Object expected) {
+            test(command, expected);
+        }
+
+        @ParameterizedTest
+        @MethodSource
+        public void testNArgsStar(String name, String command, Object expected) {
+            test(command, expected);
+        }
+
+        public static Stream<Arguments> testNArgsStar() {
+            return Stream.of(
+                    /**this is for validate --flag=[args?] */
+                    Arguments.of("Missing arg without equals", "validate --flag",  Map.of("flag", Optional.empty())),
+                    Arguments.of("Missing arg with and quotations", "validate --flag=\"\"",  Map.of("flag", Optional.empty())),
+                    Arguments.of("Missing arg with and brackets", "validate --flag=[]",  Map.of("flag", Optional.empty())),
+                    Arguments.of("One arg without brackets", "validate --flag=1",  Map.of("flag", new ArrayList<>(List.of(1)))),
+                    Arguments.of("One arg with brackets", "validate --flag=[1]",  Map.of("flag", new ArrayList<>(List.of(1)))),
+                    Arguments.of("More than one arg", "validate --flag=[1 2 3 4]",  Map.of("flag", new ArrayList<>(Arrays.asList(1, 2, 3, 4))))
+            );
+        }
+
+        public static Stream<Arguments> testNArgsPlus() {
+            return Stream.of(
+                    /**this is for validate --flag=[args+] */
+                    Arguments.of("Missing arg without equals", "validate --flag",  null),
+                    Arguments.of("Missing arg with and quotations", "validate --flag=\"\"",  null),
+                    Arguments.of("Missing arg with and brackets", "validate --flag=[]",  null),
+                    Arguments.of("One arg without brackets", "validate --flag=1",  Map.of("flag", new ArrayList<>(List.of(1)))),
+                    Arguments.of("One arg with brackets", "validate --flag=[1]",  Map.of("flag", new ArrayList<>(List.of(1)))),
+                    Arguments.of("More than one arg", "validate --flag=[1 2]",  Map.of("flag", new ArrayList<>(Arrays.asList(1, 2))))
+            );
+        }
+
+    }
+
+    @Nested
+    class ValidatePositional {
+        @ParameterizedTest
+        @MethodSource
+        public void testValidateSimplePattern(String name, String command, Object expected) {
+            test(command, expected);
+        }
+
+        public static Stream<Arguments> testValidateSimplePattern() {
+            return Stream.of(
+                    /**this is for validate positional*/
+                    Arguments.of("Quoted flag", "validate --flag", null),
+                    Arguments.of("Quoted flag", "validate \"--flag\"", Map.of("positional", "--flag"),
+                    Arguments.of("Too many arguments", "validate --flag 1 pattern", null),
+                    Arguments.of("Correct input no flag", "validate pattern", Map.of("flag", Optional.empty(), "pattern", "pattern")),
+                    Arguments.of("Correct input no bracket", "validate --flag=1  pattern", Map.of("flag", new ArrayList<>(List.of(1)), "pattern", "pattern")),
+                    Arguments.of("Correct input with flag", "validate --flag=[1 2] pattern",  Map.of("flag", new ArrayList<>(Arrays.asList(1, 2)), "pattern", "pattern")),
+                    Arguments.of("Multiple word patterns", "validate --flag=[1 2] \"pattern of multiple words\"",  Map.of("flag", new ArrayList<>(Arrays.asList(1, 2)), "pattern", "\"pattern of multiple words\""))
+            );
+        }
+    }
+
+
+
+
+        private static void test(String command, Object expected)  {
         if (expected != null) {
-            var result = Scenarios.parse(command);
-            Assertions.assertEquals(expected, result);
+            try {
+                var result = Scenarios.parse(command);
+                Assertions.assertEquals(expected, result);
+            }catch(Exception e){
+                Assertions.fail("unexpected exception thrown");
+            }
         } else {
             //TODO: Update with your specific Exception class or whatever other
             //error handling model you use to check for specific library issues.
-            Assertions.assertThrows(Exception.class, () -> {
+            Assertions.assertThrows(ValidationException.class, () -> {
                 Scenarios.parse(command);
             });
         }
