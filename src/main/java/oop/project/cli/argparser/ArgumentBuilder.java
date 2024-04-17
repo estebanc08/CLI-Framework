@@ -5,7 +5,7 @@ import java.lang.reflect.Type;
 public class ArgumentBuilder {
     protected String[] names;
     protected String ref;
-    protected Type type;  // note: we may need to change this
+    protected Object type;  // note: we may need to change this
     protected IRange<Type> range;  // also this too :(
     protected String nArgs;
     protected String helpMessage;
@@ -13,7 +13,7 @@ public class ArgumentBuilder {
     protected boolean required;
     protected boolean positional;
 
-    ArgumentBuilder(Type type, String ref, String... names) {
+    ArgumentBuilder(Object type, String ref, String... names) {
         this.type = type;
         this.ref = ref;
         this.names = names;

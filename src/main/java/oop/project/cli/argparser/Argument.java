@@ -5,7 +5,7 @@ import java.lang.reflect.Type;
 public class Argument {
     public final String[] names;
     public final String ref;
-    public final Type type;
+    public final Object type;
     public final IRange<Type> range;
     public final String nArgs;
     public final String helpMessage;
