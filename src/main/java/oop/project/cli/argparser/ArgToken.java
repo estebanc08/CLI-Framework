@@ -7,4 +7,5 @@ public record ArgToken() {
     static TokenKind kind;
     static String name;
     static String value;
+    static Argument argument;
 }

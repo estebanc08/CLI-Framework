@@ -6,7 +6,7 @@ public class Argument {
     public final String[] names;
     public final String ref;
     public final Object type;
-    public final IRange<Type> range;
+    public final IRange<Comparable<?>> range;
     public final String nArgs;
     public final String helpMessage;
     public final String helpName;
