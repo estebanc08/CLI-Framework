@@ -19,7 +19,8 @@ public class ArgumentBuilder {
     protected boolean required;
     protected boolean positional;
 
-    private final String identifierPattern = "[a-zA-Z_][a-zA-Z0-9_]*";
+    private final String identifierPattern = "[a-zA-Z_][a-zA-Z0-9_-]*";
+
     /**
      * Validates a string to ensure that it conforms with the regex pattern we've chosen
      *  for identifiers.
@@ -61,7 +62,10 @@ public class ArgumentBuilder {
 
 
     // I honestly have no clue how we'll do type checking with IRange (or how java generics even work)
-    ArgumentBuilder setRange(IRange range) { this.range = range; return this; }
+    ArgumentBuilder setRange(IRange<Comparable<?>> range) {
+        this.range = range;
+        return this;
+    }
     ArgumentBuilder setNArgs(String nArgs) {
         String errorMessage = "Error: Invalid input to setNArgs. (Must be ?,*,+ or integer)";
         String nargFlags = "?*+";
