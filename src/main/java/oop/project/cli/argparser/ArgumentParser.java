@@ -49,16 +49,15 @@ public class ArgumentParser {
     //          - How do we get input? Do we modify this method signature to take a string, or do we
     //              actually wait for IO in this method? I think waiting for IO makes the most sense, but
     //              we would have to properly document that so it doesn't surprise the user.
-    public void parse() {
+    public void parse(String input) throws ValidationException{
         // TODO: Full end-to-end parsing, calling lex and validate
+//        try {
+//            validate(lex(input));
+//        } catch (ValidationException err) {
+//            // TODO: Do something with it, tell the user somehow
+//        }
 
-        String input = "todo";  // How do we call user input? Do we pass it into this method...
-                                    // or do we wait for IO here? Which makes more sense?
-        try {
-            validate(lex(input));
-        } catch (ValidationException err) {
-            // TODO: Do something with it, tell the user somehow
-        }
+        validate(lex(input)); //will be caught by programmer
     }
 
     /**
