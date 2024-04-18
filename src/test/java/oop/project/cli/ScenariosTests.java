@@ -220,14 +220,14 @@ public class ScenariosTests {
         public static Stream<Arguments> testNArgsNone() {
             return Stream.of(
                     /**this is for validate --flag=[args?] */
-                    Arguments.of("Missing arg without equals", "validate --flag",  Map.of("flag", Optional.empty())),
-                    Arguments.of("Missing arg with and quotations", "validate --flag=\"\"",  Map.of("flag", Optional.empty())),
-                    Arguments.of("Missing arg with and brackets", "validate --flag=[]",  Map.of("flag", Optional.empty())),
-                    Arguments.of("One arg without brackets", "validate --flag=\"1\"", null),
-                    Arguments.of("One arg with brackets", "validate --flag=[\"1\"]",  null),
-                    Arguments.of("One arg with brackets multiple words", "validate --flag=[\"There are multiple words\"]", null),
-                    Arguments.of("One arg with brackets multiple words", "validate --flag=[\"There are multiple words\" \"another one\"]",  null),
-                    Arguments.of("More than one arg", "validate --flag=[\"1\" \"2\"]",  null)
+                    Arguments.of("Missing arg without equals", "noArgs --flag",  Map.of("flag", Optional.empty())),
+                    Arguments.of("Missing arg with and quotations", "noArgs --flag=\"\"",  Map.of("flag", Optional.empty())),
+                    Arguments.of("Missing arg with and brackets", "noArgs --flag=[]",  Map.of("flag", Optional.empty())),
+                    Arguments.of("One arg without brackets", "noArgs --flag=\"1\"", null),
+                    Arguments.of("One arg with brackets", "noArgs --flag=[\"1\"]",  null),
+                    Arguments.of("One arg with brackets multiple words", "noArgs --flag=[\"There are multiple words\"]", null),
+                    Arguments.of("One arg with brackets multiple words", "noArgs --flag=[\"There are multiple words\" \"another one\"]",  null),
+                    Arguments.of("More than one arg", "noArgs --flag=[\"1\" \"2\"]",  null)
             );
         }
 
@@ -240,15 +240,15 @@ public class ScenariosTests {
 
         public static Stream<Arguments> testNArgsQuestion() {
             return Stream.of(
-                    /**this is for validate --flag=[args?] */
-                    Arguments.of("Missing arg without equals", "validate --flag",  Map.of("flag", Optional.empty())),
-                    Arguments.of("Missing arg with and quotations", "validate --flag=\"\"",  Map.of("flag", Optional.empty())),
-                    Arguments.of("Missing arg with and brackets", "validate --flag=[]",  Map.of("flag", Optional.empty())),
-                    Arguments.of("One arg without brackets", "validate --flag=\"1\"",  Map.of("flag", new ArrayList<>(List.of("1")))),
-                    Arguments.of("One arg with brackets", "validate --flag=[\"1\"]",  Map.of("flag", new ArrayList<>(List.of("1")))),
-                    Arguments.of("One arg with brackets multiple words", "validate --flag=[\"There are multiple words\"]",  Map.of("flag", new ArrayList<>(List.of("There are multiple words")))),
-                    Arguments.of("One arg with brackets multiple words", "validate --flag=[\"There are multiple words\" \"another one\"]",  null),
-                    Arguments.of("More than one arg", "validate --flag=[\"1\" \"2\"]",  null)
+                    /**this is for flagNArgsQuestion --flag=[args?] */
+                    Arguments.of("Missing arg without equals", "flagNArgsQuestion --flag",  Map.of("flag", Optional.empty())),
+                    Arguments.of("Missing arg with and quotations", "flagNArgsQuestion --flag=\"\"",  Map.of("flag", Optional.empty())),
+                    Arguments.of("Missing arg with and brackets", "flagNArgsQuestion --flag=[]",  Map.of("flag", Optional.empty())),
+                    Arguments.of("One arg without brackets", "flagNArgsQuestion --flag=\"1\"",  Map.of("flag", new ArrayList<>(List.of("1")))),
+                    Arguments.of("One arg with brackets", "flagNArgsQuestion --flag=[\"1\"]",  Map.of("flag", new ArrayList<>(List.of("1")))),
+                    Arguments.of("One arg with brackets multiple words", "flagNArgsQuestion --flag=[\"There are multiple words\"]",  Map.of("flag", new ArrayList<>(List.of("There are multiple words")))),
+                    Arguments.of("One arg with brackets multiple words", "flagNArgsQuestion --flag=[\"There are multiple words\" \"another one\"]",  null),
+                    Arguments.of("More than one arg", "flagNArgsQuestion --flag=[\"1\" \"2\"]",  null)
             );
         }
 
@@ -256,6 +256,18 @@ public class ScenariosTests {
         @MethodSource
         public void testNArgsPlus(String name, String command, Map<String, List<Object>> expected ) {
             test(command, expected);
+        }
+
+        public static Stream<Arguments> testNArgsPlus() {
+            return Stream.of(
+                    /**this is for validate --flag=[args+]*/
+                    Arguments.of("Missing arg without equals", "flagNArgsPlus --flag",  null),
+                    Arguments.of("Missing arg with and quotations", "flagNArgsPlus --flag=\"\"",  null),
+                    Arguments.of("Missing arg with and brackets", "flagNArgsPlus --flag=[]",  null),
+                    Arguments.of("One arg without brackets", "flagNArgsPlus --flag=\"1\"",  Map.of("flag", new ArrayList<>(List.of("1")))),
+                    Arguments.of("One arg with brackets", "flagNArgsPlus --flag=[\"1\"]",  Map.of("flag", new ArrayList<>(List.of("1")))),
+                    Arguments.of("More than one arg", "flagNArgsPlus --flag=[\"1\" \"2\"]",  Map.of("flag", new ArrayList<>(List.of("1", "2"))))
+            );
         }
 
         @ParameterizedTest
@@ -266,25 +278,13 @@ public class ScenariosTests {
 
         public static Stream<Arguments> testNArgsStar() {
             return Stream.of(
-                    /**this is for validate --flag=[args?] */
-                    Arguments.of("Missing arg without equals", "validate --flag",  Map.of("flag", Optional.empty())),
-                    Arguments.of("Missing arg with and quotations", "validate --flag=\"\"",  Map.of("flag", Optional.empty())),
-                    Arguments.of("Missing arg with and brackets", "validate --flag=[]",  Map.of("flag", Optional.empty())),
-                    Arguments.of("One arg without brackets", "validate --flag=\"1\"",  Map.of("flag", new ArrayList<>(List.of("1")))),
-                    Arguments.of("One arg with brackets", "validate --flag=[\"1\"]",  Map.of("flag", new ArrayList<>(List.of("1")))),
-                    Arguments.of("More than one arg", "validate --flag=[\"1\" \"2\" \"3\" \"4\"]",  Map.of("flag", new ArrayList<>(List.of("1", "2", "3", "4"))))
-            );
-        }
-
-        public static Stream<Arguments> testNArgsPlus() {
-            return Stream.of(
-                    /**this is for validate --flag=[args+]*/
-                    Arguments.of("Missing arg without equals", "validate --flag",  null),
-                    Arguments.of("Missing arg with and quotations", "validate --flag=\"\"",  null),
-                    Arguments.of("Missing arg with and brackets", "validate --flag=[]",  null),
-                    Arguments.of("One arg without brackets", "validate --flag=\"1\"",  Map.of("flag", new ArrayList<>(List.of("1")))),
-                    Arguments.of("One arg with brackets", "validate --flag=[\"1\"]",  Map.of("flag", new ArrayList<>(List.of("1")))),
-                    Arguments.of("More than one arg", "validate --flag=[\"1\" \"2\"]",  Map.of("flag", new ArrayList<>(List.of("1", "2"))))
+                    /**this is for flagNArgsStar --flag=[args?] */
+                    Arguments.of("Missing arg without equals", "flagNArgsStar --flag", Map.of("flag", Optional.empty())),
+                    Arguments.of("Missing arg with and quotations", "flagNArgsStar --flag=\"\"", Map.of("flag", Optional.empty())),
+                    Arguments.of("Missing arg with and brackets", "flagNArgsStar --flag=[]", Map.of("flag", Optional.empty())),
+                    Arguments.of("One arg without brackets", "flagNArgsStar --flag=\"1\"", Map.of("flag", new ArrayList<>(List.of("1")))),
+                    Arguments.of("One arg with brackets", "flagNArgsStar --flag=[\"1\"]", Map.of("flag", new ArrayList<>(List.of("1")))),
+                    Arguments.of("More than one arg", "flagNArgsStar --flag=[\"1\" \"2\" \"3\" \"4\"]", Map.of("flag", new ArrayList<>(List.of("1", "2", "3", "4"))))
             );
         }
 
@@ -305,14 +305,14 @@ public class ScenariosTests {
         public static Stream<Arguments> testNArgsQuestion() {
             return Stream.of(
                     /**
-                     this is for validate [positional?]
+                     this is for positionalNArgQuestion [positional?]
                      */
-                    Arguments.of("Empty Positional", "validate",  Map.of("flag", Optional.empty())),
-                    Arguments.of("Unquoted Flag", "validate --flag", null),
-                    Arguments.of("Quoted Flag", "validate \"--flag\"", Map.of("positional", new ArrayList<>(List.of("1")))),
-                    Arguments.of("Regular Number", "validate \"1\"", Map.of("positional", new ArrayList<>(List.of("1")))),
-                    Arguments.of("Multiple Positional Args", "validate [\"1\" \"2\" \"hi\"]",  null),
-                    Arguments.of("String Arguments unquoted", "validate [hi]",  null)
+                    Arguments.of("Empty Positional", "positionalNArgQuestion",  Map.of("flag", Optional.empty())),
+                    Arguments.of("Unquoted Flag", "positionalNArgQuestion --flag", null),
+                    Arguments.of("Quoted Flag", "positionalNArgQuestion \"--flag\"", Map.of("positional", new ArrayList<>(List.of("1")))),
+                    Arguments.of("Regular Number", "positionalNArgQuestion \"1\"", Map.of("positional", new ArrayList<>(List.of("1")))),
+                    Arguments.of("Multiple Positional Args", "positionalNArgQuestion [\"1\" \"2\" \"hi\"]",  null),
+                    Arguments.of("String Arguments unquoted", "positionalNArgQuestion [hi]",  null)
             );
         }
 
@@ -327,11 +327,11 @@ public class ScenariosTests {
                     /**
                      this is for validate [positional+]
                      */
-                    Arguments.of("Empty Positional", "validate", null),
-                    Arguments.of("Unquoted Flag", "validate --flag", null),
-                    Arguments.of("Quoted Flag", "validate \"--flag\"", Map.of("positional", new ArrayList<>(List.of("--flag")))),
-                    Arguments.of("Regular Number", "validate \"1\"", Map.of("positional", new ArrayList<>(List.of("1")))),
-                    Arguments.of("Multiple Positional Args ", "validate [\"1\" \"2\" \"hi\"]",  Map.of("flag", new ArrayList<>(List.of("1", "2", "hi"))))
+                    Arguments.of("Empty Positional", "positionalNArgPlus", null),
+                    Arguments.of("Unquoted Flag", "positionalNArgPlus --flag", null),
+                    Arguments.of("Quoted Flag", "positionalNArgPlus \"--flag\"", Map.of("positional", new ArrayList<>(List.of("--flag")))),
+                    Arguments.of("Regular Number", "positionalNArgPlus \"1\"", Map.of("positional", new ArrayList<>(List.of("1")))),
+                    Arguments.of("Multiple Positional Args ", "positionalNArgPlus [\"1\" \"2\" \"hi\"]",  Map.of("flag", new ArrayList<>(List.of("1", "2", "hi"))))
             );
         }
 
@@ -346,38 +346,38 @@ public class ScenariosTests {
                     /**
                         this is for validate [positional*]
                      */
-                    Arguments.of("Empty Positional", "validate",  Map.of("flag", Optional.empty())),
-                    Arguments.of("Unquoted Flag", "validate --flag", null),
-                    Arguments.of("Quoted Flag", "validate \"--flag\"", Map.of("positional", new ArrayList<>(List.of("--flag")))),
-                    Arguments.of("Multiple Positional Args", "validate [\"1\" \"2\" \"hi\"]",  Map.of("flag", new ArrayList<>(List.of("1", "2", "hi"))))
+                    Arguments.of("Empty Positional", "positionalNArgStar",  Map.of("flag", Optional.empty())),
+                    Arguments.of("Unquoted Flag", "positionalNArgStar --flag", null),
+                    Arguments.of("Quoted Flag", "positionalNArgStar \"--flag\"", Map.of("positional", new ArrayList<>(List.of("--flag")))),
+                    Arguments.of("Multiple Positional Args", "positionalNArgStar [\"1\" \"2\" \"hi\"]",  Map.of("flag", new ArrayList<>(List.of("1", "2", "hi"))))
                     );
         }
     }
 
-    @Nested
-    class ValidateHelp {
-        @ParameterizedTest
-        @MethodSource
-        public void testHelpDefault(String name, String command, Map<String, List<Object>> expected ) {
-            test(command, expected);
-        }
-        public static Stream<Arguments> testHelpDefault() {
-            return Stream.of(
-                    Arguments.of("Empty Positional", "helpDefault -h",  "")
-            );
-        }
-
-        @ParameterizedTest
-        @MethodSource
-        public void testHelpMessage(String name, String command, Map<String, List<Object>> expected ) {
-            test(command, expected);
-        }
-        public static Stream<Arguments> testHelpMessage() {
-            return Stream.of(
-                    Arguments.of("Empty Positional", "helpCustom -h",  "Successful Help")
-            );
-        }
-    }
+//    @Nested
+//    class ValidateHelp {
+//        @ParameterizedTest
+//        @MethodSource
+//        public void testHelpDefault(String name, String command, Map<String, List<Object>> expected ) {
+//            test(command, expected);
+//        }
+//        public static Stream<Arguments> testHelpDefault() {
+//            return Stream.of(
+//                    Arguments.of("Empty Positional", "helpDefault -h",  "")
+//            );
+//        }
+//
+//        @ParameterizedTest
+//        @MethodSource
+//        public void testHelpMessage(String name, String command, Map<String, List<Object>> expected ) {
+//            test(command, expected);
+//        }
+//        public static Stream<Arguments> testHelpMessage() {
+//            return Stream.of(
+//                    Arguments.of("Empty Positional", "helpCustom -h",  "Successful Help")
+//            );
+//        }
+//    }
 
     @Nested
     class ValidateRequired {

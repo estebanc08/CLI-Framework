@@ -28,7 +28,15 @@ public class Scenarios {
             case "ints" -> ints(arguments);
             case "decimal" -> decimal(arguments);
             case "date" -> date(arguments);
-//            case "validate" -> validate(arguments);
+            case "noArgs" -> noArgs(arguments);
+            case "flagNArgsQuestion" -> flagNArgsQuestion(arguments);
+            case "flagNArgsPlus" -> flagNArgsPlus(arguments);
+            case "flagNArgsStar" -> flagNArgsStar(arguments);
+            case "positionalNArgsQuestion" -> positionalNArgsQuestion(arguments);
+            case "positionalNArgsPlus" -> positionalNArgsPlus(arguments);
+            case "positionalNArgsStar" -> positionalNArgsStar(arguments);
+            case "requiredFalse" -> requiredFalse(arguments);
+            case "requiredTrue" -> requiredTrue(arguments);
             default -> throw new IllegalArgumentException("Unknown command.");
         };
     }
@@ -49,8 +57,62 @@ public class Scenarios {
     }
 
     static Map<String, List<Object>> decimal(String arguments) {
+        //TODO implement
         return null;
     }
+
+    static Map<String, List<Object>> noArgs(String arguments) {
+        //TODO implement
+        return null;
+    }
+
+    static Map<String, List<Object>> flagNArgsQuestion(String arguments) {
+        //Todo Implement
+        return null;
+    }
+
+
+    static Map<String, List<Object>> flagNArgsPlus(String arguments) {
+        //Todo Implement
+        return null;
+    }
+
+    static Map<String, List<Object>> flagNArgsStar(String arguments) {
+        //Todo Implement
+        return null;
+    }
+
+
+    static Map<String, List<Object>> positionalNArgsQuestion(String arguments) {
+        //Todo Implement
+        return null;
+    }
+
+
+    static Map<String, List<Object>> positionalNArgsPlus(String arguments) {
+        //Todo Implement
+        return null;
+    }
+
+    static Map<String, List<Object>> positionalNArgsStar(String arguments) {
+        //Todo Implement
+        return null;
+    }
+
+    static Map<String, List<Object>> requiredFalse(String arguments) {
+        //Todo Implement
+        return null;
+    }
+
+    static Map<String, List<Object>> requiredTrue(String arguments) {
+        //Todo Implement
+        return null;
+    }
+
+
+
+
+
 
 
     /**
