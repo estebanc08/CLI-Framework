@@ -409,6 +409,110 @@ public class ScenariosTests {
         }
     }
 
+    @Nested
+    class ValidateCombined {
+        @ParameterizedTest
+        @MethodSource
+        public void testMultipleFlags(String name, String command, Map<String, List<Object>> expected ) {
+            test(command, expected);
+        }
+        public static Stream<Arguments> testMultipleFlags() {
+            return Stream.of(
+                    /**testing for multFlags --flag1*.string.required --flag2*.int.optional */
+                    Arguments.of("Both Flags given value", "multFlags --flag1=[\"hi\"] --flag2=2",
+                            Map.of( "flag1", new ArrayList<>(List.of("hi")),
+                                    "flag2", new ArrayList<>(List.of(new BigInteger("1"))))),
+                    Arguments.of("Optional flag empty present, no value", "multFlags --flag1=[\"hi\"] --flag2",
+                            Map.of( "flag1", new ArrayList<>(List.of("hi")),
+                                    "flag2", Optional.empty())),
+                    /*TODO: Decide if present flag with no values is optional empty or array list with no values
+                    *  i.e figure out if empty is the same is not present  --flag2 === noFlag ?
+                    *  Current assumption is they are the same. Might have to change if given star argument as still can be present but no value */
+                    Arguments.of("Optional flag not present", "multFlags --flag1=[\"hi\"]",
+                            Map.of( "flag1", new ArrayList<>(List.of("hi")),
+                                    "flag2", Optional.empty())),
+                    Arguments.of("Required flag not present", "multFlags --flag2=1", null),
+                    Arguments.of("No Flags present", "multFlags", null),
+                    Arguments.of("Order swapped", "multFlags --flag2=[1 2 3] --flag1=[\"hi\"]",
+                            Map.of( "flag1", new ArrayList<>(List.of("hi")),
+                                    "flag2", new ArrayList<>(List.of(new BigInteger("1"), new BigInteger("2"), new BigInteger("3"))))),
+                    Arguments.of("Duplicate flags", "multFlags --flag1=[\"hi\"] --flag1=[\"hello\"]", null)
+                    //TODO: DECIDE IF LAST VALUE WINS OR THROW ERROR: I SAY THROW ERROR FOR PREDICTABILITY
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource
+        public void testMultiplePositionals(String name, String command, Map<String, List<Object>> expected ) {
+            test(command, expected);
+        }
+        public static Stream<Arguments> testMultiplePositionals() {
+            return Stream.of(
+                    /**testing for multPos [source*.string.optional] [dest?.string.required] */
+                    Arguments.of("Both positionals given value", "multPos [\"file1.txt\"] [\"output.txt\"]",
+                            Map.of( "source", new ArrayList<>(List.of("file1.txt")),
+                                    "dest", new ArrayList<>(List.of("output.txt")))),
+                    Arguments.of("First positional multiple values", "multPos [\"file1.txt\" \"file2.txt\"] [\"output.txt\"]",
+                            Map.of( "source", new ArrayList<>(List.of("file1.txt", "file2.txt")),
+                                    "dest",  new ArrayList<>(List.of("output.txt")))),
+                    Arguments.of("Second positional multiple values", "multPos [\"file1.txt\" \"file2.txt\"] [\"output.txt\" \"output2.txt\"]", null),
+                    Arguments.of("Missing first positional", "multPos [\"output.txt\"]",
+                            Map.of( "source", Optional.empty(),
+                                    "dest",  new ArrayList<>(List.of("output.txt")))),
+                    Arguments.of("Required positional too many args and first one missing", "multPos [\"output.txt\" \"output2\"]",null),
+                    Arguments.of("Missing both positionals", "multPos", null),
+                    Arguments.of("Extra Positional", "multPos [\"1\"] [\"2\"] [\"3\"]", null)
+
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource
+        public void testBoth(String name, String command, Map<String, List<Object>> expected ) {
+            test(command, expected);
+        }
+        public static Stream<Arguments> testBoth() {
+            return Stream.of(
+                    /**testing for rem --flag1?.string.optional --flag2?.string.optional --flag3?.string.required [source*.string.optional] [source*.string.required]*/
+                    Arguments.of("All values present", "rem --flag1=[\"f1\"] --flag2=[\"f2\"] --flag3=[\"f3\"] [\"source\"] [\"dest\"]",
+                            Map.of( "flag1", new ArrayList<>(List.of("f1")),
+                                    "flag2", new ArrayList<>(List.of("f2")),
+                                    "flag3", new ArrayList<>(List.of("f3")),
+                                    "source", new ArrayList<>(List.of("source")),
+                                    "dest", new ArrayList<>(List.of("dest")))),
+                    Arguments.of("All optional missing", "rem --flag3=[\"f3\"][\"dest\"]",
+                                    "flag3", new ArrayList<>(List.of("f3")),
+                                    "dest", new ArrayList<>(List.of("dest"))),
+                    Arguments.of("Required Flag missing", "rem --flag1=[\"f1\"] --flag2=[\"f2\"]  [\"source\"] [\"dest\"]", null),
+                    Arguments.of("Required positional missing", "rem --flag1=[\"f1\"] --flag2=[\"f2\"] --flag3=[\"f3\"] ", null),
+                    Arguments.of("Ordered reversed", "rem [\"source\"] [\"dest\"] --flag1=[\"f1\"] --flag2=[\"f2\"] --flag3=[\"f3\"]",
+                            Map.of( "flag1", new ArrayList<>(List.of("f1")),
+                                    "flag2", new ArrayList<>(List.of("f2")),
+                                    "flag3", new ArrayList<>(List.of("f3")),
+                                    "source", new ArrayList<>(List.of("source")),
+                                    "dest", new ArrayList<>(List.of("dest")))),
+                    //TODO: NOT SURE IF ORDER OF CODE ABOVE SHOULD MATTER i.e FLAGS FIRST THEN POSITIONAL OR IF CAN BE POSITIONAL THEN FLAG
+                    Arguments.of("Flag sandwich", "rem [\"source\"] --flag1=[\"f1\"] --flag2=[\"f2\"] --flag3=[\"f3\"] [\"dest\"]",
+                            Map.of( "flag1", new ArrayList<>(List.of("f1")),
+                                    "flag2", new ArrayList<>(List.of("f2")),
+                                    "flag3", new ArrayList<>(List.of("f3")),
+                                    "source", new ArrayList<>(List.of("source")),
+                                    "dest", new ArrayList<>(List.of("dest")))),
+                    //TODO: DECIDE IF THIS SHOULD EVEN BE ALLOWED
+                    Arguments.of("Flag sandwich", "rem --flag1=[\"f1\"] --flag2=[\"f2\"] [\"source\"] --flag3=[\"f3\"] [\"dest\"]",
+                            Map.of( "flag1", new ArrayList<>(List.of("f1")),
+                                    "flag2", new ArrayList<>(List.of("f2")),
+                                    "flag3", new ArrayList<>(List.of("f3")),
+                                    "source", new ArrayList<>(List.of("source")),
+                                    "dest", new ArrayList<>(List.of("dest")))),
+                    //TODO: ALSO DECIDE IF THIS IS ALLOWED. IF LAST ONE ALLOWED, SO SHOULD THIS ONE. DECIDE IF ORDER MATTERS
+                    Arguments.of("Empty command", "rem", null)
+            );
+        }
+
+    }
+
+
 
 
 
