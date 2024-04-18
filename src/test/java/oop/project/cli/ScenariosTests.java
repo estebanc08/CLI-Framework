@@ -7,9 +7,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.text.DateFormat;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Stream;
+import java.util.Date;
 
 public class ScenariosTests {
 
@@ -18,7 +22,7 @@ public class ScenariosTests {
 
         @ParameterizedTest
         @MethodSource
-        public void testAdd(String name, String command, Object expected) {
+        public void testAdd(String name, String command, Map<String, List<Object>> expected ) {
             test(command, expected);
         }
 
@@ -39,7 +43,7 @@ public class ScenariosTests {
 
         @ParameterizedTest
         @MethodSource
-        public void testSub(String name, String command, Object expected) {
+        public void testSub(String name, String command, Map<String, List<Object>> expected ) {
             test(command, expected);
         }
 
@@ -62,7 +66,7 @@ public class ScenariosTests {
 
         @ParameterizedTest
         @MethodSource
-        public void testSqrt(String name, String command, Object expected) {
+        public void testSqrt(String name, String command, Map<String, List<Object>> expected ) {
             test(command, expected);
         }
 
@@ -82,7 +86,7 @@ public class ScenariosTests {
 
         @ParameterizedTest
         @MethodSource
-        public void testCalc(String name, String command, Object expected) {
+        public void testCalc(String name, String command, Map<String, List<Object>> expected ) {
             test(command, expected);
         }
 
@@ -103,7 +107,7 @@ public class ScenariosTests {
 
         @ParameterizedTest
         @MethodSource
-        public void testDate(String name, String command, Object expected) {
+        public void testDate(String name, String command, Map<String, List<Object>> expected ) {
             test(command, expected);
         }
 
@@ -121,13 +125,13 @@ public class ScenariosTests {
 
         @ParameterizedTest
         @MethodSource
-        public void testStringTypes(String name, String command, Object expected) {
+        public void testStringTypes(String name, String command, Map<String, List<Object>> expected ) {
             test(command, expected);
         }
 
         public static Stream<Arguments> testStringTypes() {
             return Stream.of(
-                    /** this is for `type positional` where positional required and is of type * */
+                    /** this is for `type positional` where positional required and is of type string* */
                     Arguments.of("Standard String - no bracket", "string \"hi\"",  Map.of("positional", new ArrayList<>(List.of("hi")))),
                     Arguments.of("Standard String - bracket", "string [\"hi\" \"hello\"]",  Map.of("positional", new ArrayList<>(List.of("hi", "hello")))),
                     Arguments.of("Missing quotes", "string hi", null),
@@ -141,7 +145,64 @@ public class ScenariosTests {
             );
         }
 
+        @ParameterizedTest
+        @MethodSource
+        public void testIntType(String name, String command, Map<String, List<Object>> expected ) {
+            test(command, expected);
+        }
 
+        public static Stream<Arguments> testIntType() {
+            return Stream.of(
+                    /** this is for `type positional` where positional required and is of type int* */
+                    Arguments.of("Standard Int", "ints 1",  Map.of("positional", new ArrayList<>(List.of(new BigInteger("1"))))),
+                    Arguments.of("Decimal Value", "ints 1.0",  null), //TODO: Could be possible to return just 1 and round all decimals to nearest Integer
+                    Arguments.of("Int inside quotes", "ints \"1\"", null), //TODO: Possibly change if type coercion implemented
+                    Arguments.of("All String", "ints hi", null),
+                    Arguments.of("Number and String", "ints 12k5", null),
+                    Arguments.of("Negative Numbers", "ints -1", Map.of("positional", new ArrayList<>(List.of(new BigInteger("-1"))))),
+                    Arguments.of("Large Number", "ints 2147483648", Map.of("positional", new ArrayList<>(List.of(new BigInteger("2147483648"))))),
+                    Arguments.of("Large Number - Negative", "ints -2147483649", Map.of("positional", new ArrayList<>(List.of(new BigInteger("-2147483649")))))
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource
+        public void testDecimalType(String name, String command, Map<String, List<Object>> expected ) {
+            test(command, expected);
+        }
+
+        public static Stream<Arguments> testDecimalType() {
+            return Stream.of(
+                    /** this is for `type positional` where positional required and is of type decimal* */
+                    Arguments.of("Standard Decimal", "decimal 1.1",  Map.of("positional", new ArrayList<>(List.of(new BigDecimal("1.1"))))),
+                    Arguments.of("Decimal Value", "decimal 1.0",  Map.of("positional", new ArrayList<>(List.of(new BigDecimal("1.0"))))), //TODO: Could be possible to return just 1 and round all decimals to nearest Integer
+                    Arguments.of("Decimal inside quotes", "decimal \"1.1\"", null), //TODO: Possibly change if type coercion implemented
+                    Arguments.of("String", "decimal hi", null),
+                    Arguments.of("Scientific Notation", "decimal 1.2e3",Map.of("positional", new ArrayList<>(List.of(new BigDecimal("1200"))))),
+                    Arguments.of("Scientific Notation - decimal", "ints 1.2e-3",Map.of("positional", new ArrayList<>(List.of(new BigDecimal("0.0012"))))),
+                    Arguments.of("Negative Decimal", "decimal -1.1", Map.of("positional", new ArrayList<>(List.of(new BigInteger("-1.1"))))),
+                    Arguments.of("Large Decimal", "decimal 1234.1212121212121212121212121212", Map.of("positional", new ArrayList<>(List.of(new BigInteger("1234.1212121212121212121212121212"))))),
+                    Arguments.of("Large Decimal - Negative", "decimal -1234.1212121212121212121212121212", Map.of("positional", new ArrayList<>(List.of(new BigInteger("-2147483649")))))
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource
+        public void testDateType(String name, String command, Map<String, List<Object>> expected ) {
+            test(command, expected);
+        }
+
+        public static Stream<Arguments> testDateType() {
+            return Stream.of(
+                    /** this is for `type positional` where positional required and is of type date(YYYY-MM-DD)* */
+                    Arguments.of("Standard Date", "date 2024-04-18",  Map.of("positional", new ArrayList<>(List.of(LocalDate.parse("2024-04-18"))))),
+                    Arguments.of("Invalid Date", "date 02-02-2002", null), //TODO: Possibly add flag to signify how date should be passed
+                    Arguments.of("date inside flag", "date \"2024-04-18\"", null), //TODO: Possibly change if type coercion implemented
+                    Arguments.of("Invalid Date - extra dash start", "-2024-04-18", null),
+                    Arguments.of("Invalid Date - extra dash middle", "2024-04--18", null),
+                    Arguments.of("Invalid Date - Missing Numbers", "2024-4-18", null) //todo, should this work?
+            );
+        }
     }
 
     @Nested
@@ -152,7 +213,7 @@ public class ScenariosTests {
 
         @ParameterizedTest
         @MethodSource
-        public void testNArgsNone(String name, String command, Object expected) {
+        public void testNArgsNone(String name, String command, Map<String, List<Object>> expected ) {
             test(command, expected);
         }
 
@@ -173,7 +234,7 @@ public class ScenariosTests {
 
         @ParameterizedTest
         @MethodSource
-        public void testNArgsQuestion(String name, String command, Object expected) {
+        public void testNArgsQuestion(String name, String command, Map<String, List<Object>> expected ) {
             test(command, expected);
         }
 
@@ -193,13 +254,13 @@ public class ScenariosTests {
 
         @ParameterizedTest
         @MethodSource
-        public void testNArgsPlus(String name, String command, Object expected) {
+        public void testNArgsPlus(String name, String command, Map<String, List<Object>> expected ) {
             test(command, expected);
         }
 
         @ParameterizedTest
         @MethodSource
-        public void testNArgsStar(String name, String command, Object expected) {
+        public void testNArgsStar(String name, String command, Map<String, List<Object>> expected ) {
             test(command, expected);
         }
 
@@ -237,7 +298,7 @@ public class ScenariosTests {
 
         @ParameterizedTest
         @MethodSource
-        public void testNArgsQuestion(String name, String command, Object expected) {
+        public void testNArgsQuestion(String name, String command, Map<String, List<Object>> expected ) {
             test(command, expected);
         }
 
@@ -257,7 +318,7 @@ public class ScenariosTests {
 
         @ParameterizedTest
         @MethodSource
-        public void testNArgsPlus(String name, String command, Object expected) {
+        public void testNArgsPlus(String name, String command, Map<String, List<Object>> expected ) {
             test(command, expected);
         }
 
@@ -277,7 +338,7 @@ public class ScenariosTests {
 
         @ParameterizedTest
         @MethodSource
-        public void testNArgsStar(String name, String command, Object expected) {
+        public void testNArgsStar(String name, String command, Map<String, List<Object>> expected ) {
             test(command, expected);
         }
         public static Stream<Arguments> testNArgsStar() {
@@ -297,7 +358,7 @@ public class ScenariosTests {
     class ValidateHelp {
         @ParameterizedTest
         @MethodSource
-        public void testHelpDefault(String name, String command, Object expected) {
+        public void testHelpDefault(String name, String command, Map<String, List<Object>> expected ) {
             test(command, expected);
         }
         public static Stream<Arguments> testHelpDefault() {
@@ -308,7 +369,7 @@ public class ScenariosTests {
 
         @ParameterizedTest
         @MethodSource
-        public void testHelpMessage(String name, String command, Object expected) {
+        public void testHelpMessage(String name, String command, Map<String, List<Object>> expected ) {
             test(command, expected);
         }
         public static Stream<Arguments> testHelpMessage() {
@@ -322,7 +383,7 @@ public class ScenariosTests {
     class ValidateRequired {
         @ParameterizedTest
         @MethodSource
-        public void testRequiredFalse(String name, String command, Object expected) {
+        public void testRequiredFalse(String name, String command, Map<String, List<Object>> expected ) {
             test(command, expected);
         }
         public static Stream<Arguments> testRequiredFalse() {
@@ -336,7 +397,7 @@ public class ScenariosTests {
 
         @ParameterizedTest
         @MethodSource
-        public void testRequiredTrue(String name, String command, Object expected) {
+        public void testRequiredTrue(String name, String command, Map<String, List<Object>> expected ) {
             test(command, expected);
         }
         public static Stream<Arguments> testRequiredTrue() {
@@ -352,11 +413,24 @@ public class ScenariosTests {
 
 
 
-        private static void test(String command, Object expected)  {
+        private static void test(String command, Map<String, List<Object>> expected )  {
         if (expected != null) {
             try {
                 var result = Scenarios.parse(command);
-                Assertions.assertEquals(expected, result);
+                Assertions.assertEquals(expected.size(), result.size());
+                for (Map.Entry<String, List<Object>> entry : expected.entrySet()) {
+                    String key = entry.getKey();
+                    List<Object> expectedValue = entry.getValue();
+
+                    Assertions.assertTrue(result.containsKey(key));
+
+                    List<Object> actualValue = result.get(key);
+                    Assertions.assertEquals(expectedValue.size(), actualValue.size());
+
+                    for (int i = 0; i < expectedValue.size(); i++) {
+                        Assertions.assertEquals(expectedValue.get(i), actualValue.get(i));
+                    }
+                }
             }catch(Exception e){
                 Assertions.fail("unexpected exception thrown");
             }

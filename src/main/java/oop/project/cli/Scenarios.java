@@ -2,10 +2,9 @@ package oop.project.cli;
 
 import oop.project.cli.argparser.ValidationException;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class Scenarios {
 
@@ -16,7 +15,7 @@ public class Scenarios {
      * structure and requirements you may need to make changes to adapt it to
      * your needs - use whatever is convenient for your design.
      */
-    public static Map<String, Object> parse(String command) throws ValidationException {
+    public static Map<String, List<Object>> parse(String command) throws ValidationException {
         //This assumes commands follow a similar structure to unix commands,
         //e.g. `command [arguments...]`. If your project uses a different
         //structure, e.g. Lisp syntax like `(command [arguments...])`, you may
@@ -25,63 +24,34 @@ public class Scenarios {
         var base = split[0];
         var arguments = split.length == 2 ? split[1] : "";
         return switch (base) {
-            case "add" -> add(arguments);
-            case "sub" -> sub(arguments);
-            case "sqrt" -> sqrt(arguments);
-            case "calc" -> calc(arguments);
+            case "string" -> string(arguments);
+            case "ints" -> ints(arguments);
+            case "decimal" -> decimal(arguments);
             case "date" -> date(arguments);
 //            case "validate" -> validate(arguments);
             default -> throw new IllegalArgumentException("Unknown command.");
         };
     }
 
-    /**
-     * Takes two positional arguments:
-     *  - {@code left: <your integer type>}
-     *  - {@code right: <your integer type>}
-     */
-    private static Map<String, Object> add(String arguments) {
-        //TODO: Parse arguments and extract values.
-        int left = 0; //or BigInteger, etc.
-        int right = 0;
-        return Map.of("left", left, "right", right);
+
+    //TODO: Add your own scenarios based on your software design writeup. You
+    //should have a couple from pain points at least, and likely some others
+    //for notable features. This doesn't need to be exhaustive, but this is a
+
+    //good place to test/showcase your functionality in context.
+
+    static  Map<String, List<Object>> string(String arguments) throws ValidationException {
+        return Map.of("positional", new ArrayList<>(List.of(new BigInteger(arguments))));
     }
 
-    /**
-     * Takes two <em>named</em> arguments:
-     *  - {@code left: <your decimal type>} (optional)
-     *     - If your project supports default arguments, you could also parse
-     *       this as a non-optional decimal value using a default of 0.0.
-     *  - {@code right: <your decimal type>} (required)
-     */
-    static Map<String, Object> sub(String arguments) {
-        //TODO: Parse arguments and extract values.
-        Optional<Double> left = Optional.empty();
-        double right = 0.0;
-        return Map.of("left", left, "right", right);
+    static  Map<String, List<Object>> ints(String arguments) throws ValidationException {
+        return Map.of("positional", new ArrayList<>(List.of(new BigInteger(arguments))));
     }
 
-    /**
-     * Takes one positional argument:
-     *  - {@code number: <your integer type>} where {@code number >= 0}
-     */
-    static Map<String, Object> sqrt(String arguments) {
-        //TODO: Parse arguments and extract values.
-        int number = 0;
-        return Map.of("number", number);
+    static Map<String, List<Object>> decimal(String arguments) {
+        return null;
     }
 
-    /**
-     * Takes one positional argument:
-     *  - {@code subcommand: "add" | "div" | "sqrt" }, aka one of these values.
-     *     - Note: Not all projects support subcommands, but if yours does you
-     *       may want to take advantage of this scenario for that.
-     */
-    static Map<String, Object> calc(String arguments) {
-        //TODO: Parse arguments and extract values.
-        String subcommand = "";
-        return Map.of("subcommand", subcommand);
-    }
 
     /**
      * Takes one positional argument:
@@ -90,16 +60,12 @@ public class Scenarios {
      *     - Note: Consider this a type that CANNOT be supported by your library
      *       out of the box and requires a custom type to be defined.
      */
-    static Map<String, Object> date(String arguments) {
+    static Map<String, List<Object>> date(String arguments) {
         //TODO: Parse arguments and extract values.
         LocalDate date = LocalDate.EPOCH;
-        return Map.of("date", date);
+        return null;
+//        return Map.of("date", date);
     }
-
-    //TODO: Add your own scenarios based on your software design writeup. You
-    //should have a couple from pain points at least, and likely some others
-    //for notable features. This doesn't need to be exhaustive, but this is a
-    //good place to test/showcase your functionality in context.
 
     /**
      * Takes two <em>named</em> arguments:
