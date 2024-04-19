@@ -144,7 +144,8 @@ public class ScenariosTests {
                     Arguments.of("One arg with brackets", "flagNArgsQuestion --flag=[\"1\"]",  Map.of("flag", new ArrayList<>(List.of("1")))),
                     Arguments.of("One arg with brackets multiple words", "flagNArgsQuestion --flag=[\"There are multiple words\"]",  Map.of("flag", new ArrayList<>(List.of("There are multiple words")))),
                     Arguments.of("One arg with brackets multiple words", "flagNArgsQuestion --flag=[\"There are multiple words\" \"another one\"]",  null),
-                    Arguments.of("More than one arg", "flagNArgsQuestion --flag=[\"1\" \"2\"]",  null)
+                    Arguments.of("More than one arg", "flagNArgsQuestion --flag=[\"1\" \"2\"]",  null),
+                    Arguments.of("Incorrect Flag name", "flagNArgsQuestion --notFlag=[\"1\"]",  null)
             );
         }
 
@@ -203,7 +204,7 @@ public class ScenariosTests {
                     /**
                      this is for positionalNArgQuestion [positional?]
                      */
-                    Arguments.of("Empty Positional", "positionalNArgQuestion",  Map.of("flag", Optional.empty())),
+                    Arguments.of("Empty Positional", "positionalNArgQuestion",  Map.of("positional", Optional.empty())),
                     Arguments.of("Unquoted Flag", "positionalNArgQuestion --flag", null),
                     Arguments.of("Quoted Flag", "positionalNArgQuestion \"--flag\"", Map.of("positional", new ArrayList<>(List.of("1")))),
                     Arguments.of("Regular Number", "positionalNArgQuestion \"1\"", Map.of("positional", new ArrayList<>(List.of("1")))),
@@ -242,10 +243,11 @@ public class ScenariosTests {
                     /**
                         this is for validate [positional*]
                      */
-                    Arguments.of("Empty Positional", "positionalNArgStar",  Map.of("flag", Optional.empty())),
+                    Arguments.of("Empty Positional", "positionalNArgStar",  Map.of("positional", Optional.empty())),
                     Arguments.of("Unquoted Flag", "positionalNArgStar --flag", null),
                     Arguments.of("Quoted Flag", "positionalNArgStar \"--flag\"", Map.of("positional", new ArrayList<>(List.of("--flag")))),
-                    Arguments.of("Multiple Positional Args", "positionalNArgStar [\"1\" \"2\" \"hi\"]",  Map.of("flag", new ArrayList<>(List.of("1", "2", "hi"))))
+                    Arguments.of("Multiple Positional Args", "positionalNArgStar [\"1\" \"2\" \"hi\"]",  Map.of("flag", new ArrayList<>(List.of("1", "2", "hi")))),
+                    Arguments.of("Extra Positional", "positionalNArgStar \"one\" \"two\"",  null)
                     );
         }
     }
