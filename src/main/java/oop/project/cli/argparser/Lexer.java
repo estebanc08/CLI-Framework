@@ -19,20 +19,20 @@ public class Lexer {
         while(chars.has(0)){
             while (chars.has(0) && match("[ ]")) {} //git rid of whitespace between words
             if(peek("[\\.0-9\"\\[]") || peek("[\\-]", "[\\.0-9]")){
-                tokens.add(lexPositional());
+                tokens.add(new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", lexPositional()));
             }else if(peek("\\-" , "[a-zA-Z]") || peek("[\\-]", "[\\-]", "[a-zA-Z]")){
                 tokens.add(lexNamed());
+            }else{
+                throw new ParseException("Not a valid positional value, named argument, or flag");
             }
             if(chars.has(0) && !peek("[ ]"))
                 throw new ParseException("Required space between flags or positional values");
         }
+        for(var val : tokens){
+            System.out.println("VALUE: " + val);
+        }
         return tokens;
     }
-
-    private ArgToken lexFlag(){
-        return null;
-    };
-
 
     private String lexString(){
         StringBuilder curr = new StringBuilder();
@@ -72,13 +72,13 @@ public class Lexer {
 
     private Object lexObject(){
         //TODO: Need to differentiate between dates and negative values. Should dates be passed as strings and then type coerced later?
-        StringBuilder curr = new StringBuilder();
         if (peek("\"")) { // Check if string
             return lexString();
         } else if(peek("[0-9-\\.]")){
             return lexNumber();
+        }else{
+            throw new ParseException("Unsupported type or invalid input for value");
         }
-        return curr.toString();
     }
 
     private ArrayList<Object> lexList(){
@@ -92,22 +92,39 @@ public class Lexer {
         match("[\\]]");
         return list;
     }
-    private ArgToken lexPositional() {
-        // positionalNArgsQuestion ["hi" "hello" 1 2 3 45]
+    private ArrayList<Object> lexPositional() {
         ArrayList<Object> vals = new ArrayList<>();
         if (peek("[\\[]")) { // lexing positional multiple values
             vals.addAll(lexList());
         }else{ // lexing string or number
             vals.add(lexObject());
         }
-        for(var curr : vals){
-            System.out.println("Val: " + curr + "\tClass: " + curr.getClass() );
-        }
-        return new ArgToken(ArgToken.Type.POSITIONAL_ARG, vals);
+        return vals;
+        /** return new ArgToken(ArgToken.Type.POSITIONAL_ARG, vals);
+        / By return vals instead of argtoken, can reuse structure for lexNamed that does --flag=[], --flag=1 or --flag="word"*/
     };
 
     private ArgToken lexNamed(){
-        return null;
+        ArrayList<Object> vals = new ArrayList<>();
+        StringBuilder name = new StringBuilder();
+        if(peek("[\\-]", "[\\-]", "[a-zA-Z]")){ // --flag
+            chars.advance(2);
+            while(chars.has(0) && peek("[a-zA-Z0-9_]")){
+                name.append(chars.get(0));
+                chars.advance(1);
+            }
+            if(match("=")){
+                vals.addAll(lexPositional());
+            }
+            return new ArgToken(ArgToken.Type.NAMED_ARG, name.toString(), vals);
+        }else { //flag with one -
+            chars.advance(1);
+            name.append(chars.get(0));
+            chars.advance(1);
+            if(!peek("[ \n\r]"))
+                throw new ParseException("Flag name with single dash cannot be greater than one character"); //TODO: Decide if we want to allow for flag combinations
+            return new ArgToken(ArgToken.Type.FLAG, name.toString(), vals);
+        }
     };
 
     private boolean peek(Object... objects) {
@@ -163,8 +180,8 @@ public class Lexer {
             length += chars;
         }
 
-        public ArgToken emit(ArgToken.Type type, ArrayList<Object> vals) {
-            var token = new ArgToken(type, vals);
+        public ArgToken emit(ArgToken.Type type, String name, ArrayList<Object> vals) {
+            var token = new ArgToken(type, name, vals);
             index += length;
             length = 0;
             return token;

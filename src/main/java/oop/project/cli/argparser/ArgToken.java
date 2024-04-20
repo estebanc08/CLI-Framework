@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 record ArgToken(
         Type type,
+        String name,
         ArrayList<Object> value
 ){
     enum Type {
