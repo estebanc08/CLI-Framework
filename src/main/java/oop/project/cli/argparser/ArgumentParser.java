@@ -68,8 +68,12 @@ public class ArgumentParser {
      */
     private ArrayList<ArgToken> lex(String rawArguments) {
         // TODO: Lex
-        throw new NotImplementedException("Lexer not implemented");
+        var lexer = new Lexer(rawArguments);
+        var res = lexer.lex();
+        System.out.println(res);
+        return res;
     }
+
 
     /**
      * Validates the tokens with the arguments currently in the namespace. I.e., checks their types, ranges,

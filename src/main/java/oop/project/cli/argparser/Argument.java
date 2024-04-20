@@ -26,7 +26,7 @@ public class Argument <T>{
         required = builder.required;
         positional = builder.positional;
 
-        value = new ArrayList<>();  // Default value is blank...might not be the best design
+        value = new ArrayList<>();
     }
 
     public ArrayList<T> getValue() {
