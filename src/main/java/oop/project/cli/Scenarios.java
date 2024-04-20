@@ -1,6 +1,6 @@
 package oop.project.cli;
 
-import oop.project.cli.argparser.ValidationException;
+import oop.project.cli.argparser.*;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -37,6 +37,9 @@ public class Scenarios {
             case "positionalNArgsStar" -> positionalNArgsStar(arguments);
             case "requiredFalse" -> requiredFalse(arguments);
             case "requiredTrue" -> requiredTrue(arguments);
+            case "multFlags" -> multFlags(arguments);
+            case "multPos" -> multPos(arguments);
+            case "all" -> all(arguments);
             default -> throw new IllegalArgumentException("Unknown command.");
         };
     }
@@ -49,84 +52,280 @@ public class Scenarios {
     //good place to test/showcase your functionality in context.
 
     static  Map<String, List<Object>> string(String arguments) throws ValidationException {
-        return Map.of("positional", new ArrayList<>(List.of(new BigInteger(arguments))));
+        ArgumentParser parser = new ArgumentParser("string", "testing functionality of string parsing");
+        parser.addArgument(new ArgumentBuilder<>(String.class, "positional")
+                .setPositional(true)
+                .setRequired(false)
+                .setNArgs("*")
+                .setHelpMessage("Pass in any string to validate")
+                .build());
+
+        parser.parse(arguments); //if fails, will throw validateException
+        List<Object> res = new ArrayList<Object>(parser.getArgument("positional").getValue());
+        return Map.of("positional", res);
     }
 
     static  Map<String, List<Object>> ints(String arguments) throws ValidationException {
-        return Map.of("positional", new ArrayList<>(List.of(new BigInteger(arguments))));
+        ArgumentParser parser = new ArgumentParser("int", "testing functionality of int parsing");
+        parser.addArgument(new ArgumentBuilder<>(BigInteger.class, "positional")
+                .setPositional(true)
+                .setRequired(false)
+                .setNArgs("*")
+                .setHelpMessage("Pass in any integer to validate")
+                .build());
+
+        parser.parse(arguments); //if fails, will throw validateException
+        List<Object> res = new ArrayList<Object>(parser.getArgument("positional").getValue());
+        return Map.of("positional", res);
     }
 
-    static Map<String, List<Object>> decimal(String arguments) {
-        //TODO implement
-        return null;
+    static Map<String, List<Object>> decimal(String arguments)  throws ValidationException {
+        ArgumentParser parser = new ArgumentParser("decimal", "testing functionality of decimal parsing");
+        parser.addArgument(new ArgumentBuilder<>(BigInteger.class, "positional")
+                .setPositional(true)
+                .setRequired(false)
+                .setNArgs("*")
+                .setHelpMessage("Pass in any decimal to validate")
+                .build());
+
+        parser.parse(arguments); //if fails, will throw validateException
+        List<Object> res = new ArrayList<Object>(parser.getArgument("positional").getValue());
+        return Map.of("positional", res);
     }
 
-    static Map<String, List<Object>> noArgs(String arguments) {
-        //TODO implement
-        return null;
-    }
+    static Map<String, List<Object>> date(String arguments) throws ValidationException {
+        ArgumentParser parser = new ArgumentParser("date", "testing date parsing");
+        parser.addArgument(new ArgumentBuilder<>(Date.class, "positional")
+                .setPositional(true)
+                .setRequired(true)
+                .setNArgs("*")
+                .setHelpMessage("required date positional")
+                .build());
 
-    static Map<String, List<Object>> flagNArgsQuestion(String arguments) {
-        //Todo Implement
-        return null;
-    }
-
-
-    static Map<String, List<Object>> flagNArgsPlus(String arguments) {
-        //Todo Implement
-        return null;
-    }
-
-    static Map<String, List<Object>> flagNArgsStar(String arguments) {
-        //Todo Implement
-        return null;
-    }
-
-
-    static Map<String, List<Object>> positionalNArgsQuestion(String arguments) {
-        //Todo Implement
-        return null;
-    }
-
-
-    static Map<String, List<Object>> positionalNArgsPlus(String arguments) {
-        //Todo Implement
-        return null;
-    }
-
-    static Map<String, List<Object>> positionalNArgsStar(String arguments) {
-        //Todo Implement
-        return null;
-    }
-
-    static Map<String, List<Object>> requiredFalse(String arguments) {
-        //Todo Implement
-        return null;
-    }
-
-    static Map<String, List<Object>> requiredTrue(String arguments) {
-        //Todo Implement
-        return null;
+        parser.parse(arguments); //if fails, will throw validateException
+        List<Object> res = new ArrayList<Object>(parser.getArgument("positional").getValue());
+        return Map.of("positional", res);
     }
 
 
+    //TODO POSSIBLE BOOLEAN FLIP FOR NO ARGUMENTS
+    static Map<String, List<Object>> noArgs(String arguments) throws ValidationException {
+        ArgumentParser parser = new ArgumentParser("noArgs", "testing functionality of flag with no arguments parsing");
+        parser.addArgument(new ArgumentBuilder<>(String.class, "flag", "-f", "--flag")
+                .setPositional(false)
+                .setRequired(true)
+                .setNArgs("?")
+                .setHelpMessage("Pass in any decimal to validate")
+                .build());
+
+        parser.parse(arguments); //if fails, will throw validateException
+        List<Object> res = new ArrayList<Object>(parser.getArgument("positional").getValue());
+        return Map.of("flag", res);
+    }
+
+    static Map<String, List<Object>> flagNArgsQuestion(String arguments)  throws ValidationException {
+        ArgumentParser parser = new ArgumentParser("flagNArgsQuestion", "testing functionality of flag with ? args");
+        parser.addArgument(new ArgumentBuilder<>(String.class, "flag", "-f", "--flag")
+                .setPositional(false)
+                .setRequired(true)
+                .setNArgs("?")
+                .setHelpMessage("Pass in strings to validate if ? operation correct")
+                .build());
+
+        parser.parse(arguments); //if fails, will throw validateException
+        List<Object> res = new ArrayList<Object>(parser.getArgument("positional").getValue());
+        return Map.of("flag", res);
+    }
 
 
+    static Map<String, List<Object>> flagNArgsPlus(String arguments) throws ValidationException {
+        ArgumentParser parser = new ArgumentParser("flagNArgsPlus", "testing functionality of flag with + args");
+        parser.addArgument(new ArgumentBuilder<>(String.class, "flag", "-f", "--flag")
+                .setPositional(false)
+                .setRequired(true)
+                .setNArgs("+")
+                .setHelpMessage("Pass in strings to validate if + operation correct")
+                .build());
+
+        parser.parse(arguments); //if fails, will throw validateException
+        List<Object> res = new ArrayList<Object>(parser.getArgument("positional").getValue());
+        return Map.of("flag", res);
+    }
+
+    static Map<String, List<Object>> flagNArgsStar(String arguments)  throws ValidationException {
+        ArgumentParser parser = new ArgumentParser("flagNArgsStar", "testing functionality of flag with * args");
+        parser.addArgument(new ArgumentBuilder<>(String.class, "flag", "-f", "--flag")
+                .setPositional(false)
+                .setRequired(true)
+                .setNArgs("*")
+                .setHelpMessage("Pass in strings to validate if + operation correct")
+                .build());
+
+        parser.parse(arguments); //if fails, will throw validateException
+        List<Object> res = new ArrayList<Object>(parser.getArgument("positional").getValue());
+        return Map.of("flag", res);
+    }
 
 
+    static Map<String, List<Object>> positionalNArgsQuestion(String arguments)   throws ValidationException {
+        ArgumentParser parser = new ArgumentParser("positionalNArgQuestion", "testing functionality of positional with ? args");
+        parser.addArgument(new ArgumentBuilder<>(String.class, "positional")
+                .setPositional(true)
+                .setRequired(true)
+                .setNArgs("?")
+                .setHelpMessage("Pass in strings to validate if ? operation correct")
+                .build());
 
-    /**
-     * Takes one positional argument:
-     *  - {@code date: Date}, a custom type representing a {@code LocalDate}
-     *    object (say at least yyyy-mm-dd, or whatever you prefer).
-     *     - Note: Consider this a type that CANNOT be supported by your library
-     *       out of the box and requires a custom type to be defined.
-     */
-    static Map<String, List<Object>> date(String arguments) {
-        //TODO: Parse arguments and extract values.
-        LocalDate date = LocalDate.EPOCH;
-        return null;
-//        return Map.of("date", date);
+        parser.parse(arguments); //if fails, will throw validateException
+        List<Object> res = new ArrayList<Object>(parser.getArgument("positional").getValue());
+        return Map.of("positional", res);
+    }
+    static Map<String, List<Object>> positionalNArgsPlus(String arguments) throws ValidationException {
+        ArgumentParser parser = new ArgumentParser("positionalNArgQuestion", "testing functionality of positional with + args");
+        parser.addArgument(new ArgumentBuilder<>(String.class, "positional")
+                .setPositional(true)
+                .setRequired(true)
+                .setNArgs("+")
+                .setHelpMessage("Pass in strings to validate if + operation correct")
+                .build());
+
+        parser.parse(arguments); //if fails, will throw validateException
+        List<Object> res = new ArrayList<Object>(parser.getArgument("positional").getValue());
+        return Map.of("positional", res);
+    }
+
+    static Map<String, List<Object>> positionalNArgsStar(String arguments) throws ValidationException {
+        ArgumentParser parser = new ArgumentParser("positionalNArgsStar", "testing functionality of positional with * args");
+        parser.addArgument(new ArgumentBuilder<>(String.class, "positional")
+                .setPositional(true)
+                .setRequired(true)
+                .setNArgs("*")
+                .setHelpMessage("Pass in strings to validate if * operation correct")
+                .build());
+
+        parser.parse(arguments); //if fails, will throw validateException
+        List<Object> res = new ArrayList<Object>(parser.getArgument("positional").getValue());
+        return Map.of("positional", res);
+    }
+    static Map<String, List<Object>> requiredFalse(String arguments)  throws ValidationException {
+        ArgumentParser parser = new ArgumentParser("requiredFalse", "testing functionality required false");
+        parser.addArgument(new ArgumentBuilder<>(String.class, "positional")
+                .setPositional(true)
+                .setRequired(false)
+                .setNArgs("*")
+                .setHelpMessage("optional string positional")
+                .build());
+
+        parser.parse(arguments); //if fails, will throw validateException
+        List<Object> res = new ArrayList<Object>(parser.getArgument("positional").getValue());
+        return Map.of("positional", res);
+    }
+    static Map<String, List<Object>> requiredTrue(String arguments) throws ValidationException {
+        ArgumentParser parser = new ArgumentParser("requiredTrue", "testing functionality required true");
+        parser.addArgument(new ArgumentBuilder<>(String.class, "positional")
+                .setPositional(true)
+                .setRequired(true)
+                .setNArgs("*")
+                .setHelpMessage("required string positional")
+                .build());
+
+        parser.parse(arguments); //if fails, will throw validateException
+        List<Object> res = new ArrayList<Object>(parser.getArgument("positional").getValue());
+        return Map.of("positional", res);
+    }
+
+    static Map<String, List<Object>> multFlags(String arguments) throws ValidationException {
+        ArgumentParser parser = new ArgumentParser("multFlags", "testing functionality for multiple flags");
+        parser.addArgument(new ArgumentBuilder<>(String.class, "flag1", "-f1", "--flag1")
+                .setPositional(false)
+                .setRequired(true)
+                .setNArgs("*")
+                .setHelpMessage("required string flag")
+                .build());
+
+        parser.addArgument(new ArgumentBuilder<>(BigInteger.class, "flag2", "-f2", "--flag2")
+                .setPositional(false)
+                .setRequired(false)
+                .setNArgs("*")
+                .setHelpMessage("optional integer flag")
+                .build());
+
+        parser.parse(arguments); //if fails, will throw validateException
+
+        List<Object> flag1 = new ArrayList<Object>(parser.getArgument("flag1").getValue());
+        List<Object> flag2 = new ArrayList<Object>(parser.getArgument("flag2").getValue());
+        return Map.of("flag1", flag1, "flag2", flag2);
+    }
+
+    static Map<String, List<Object>> multPos(String arguments) throws ValidationException {
+        ArgumentParser parser = new ArgumentParser("multPos", "testing functionality for multiple positionals");
+        parser.addArgument(new ArgumentBuilder<>(String.class, "source")
+                .setPositional(true)
+                .setRequired(false)
+                .setNArgs("*")
+                .setHelpMessage("optional dest positional")
+                .build());
+
+        parser.addArgument(new ArgumentBuilder<>(String.class, "dest")
+                .setPositional(true)
+                .setRequired(true)
+                .setNArgs("?")
+                .setHelpMessage("required dest positional")
+                .build());
+
+        parser.parse(arguments); //if fails, will throw validateException
+
+        List<Object> source = new ArrayList<Object>(parser.getArgument("source").getValue());
+        List<Object> dest = new ArrayList<Object>(parser.getArgument("dest").getValue());
+        return Map.of("source", source, "dest", dest);
+    }
+
+    static Map<String, List<Object>> all(String arguments) throws ValidationException {
+        ArgumentParser parser = new ArgumentParser("all", "testing functionality for multiple positionals");
+
+        parser.addArgument(new ArgumentBuilder<>(String.class, "flag1", "-f1", "--flag1")
+                .setPositional(false)
+                .setRequired(false)
+                .setNArgs("?")
+                .setHelpMessage("optional string flag")
+                .build());
+
+        parser.addArgument(new ArgumentBuilder<>(String.class, "flag2", "-f2", "--flag2")
+                .setPositional(false)
+                .setRequired(false)
+                .setNArgs("?")
+                .setHelpMessage("optional string flag")
+                .build());
+
+        parser.addArgument(new ArgumentBuilder<>(String.class, "flag3", "-f3", "--flag3")
+                .setPositional(false)
+                .setRequired(true)
+                .setNArgs("?")
+                .setHelpMessage("required string flag")
+                .build());
+
+        parser.addArgument(new ArgumentBuilder<>(String.class, "source")
+                .setPositional(true)
+                .setRequired(false)
+                .setNArgs("*")
+                .setHelpMessage("optional dest positional")
+                .build());
+
+        parser.addArgument(new ArgumentBuilder<>(String.class, "dest")
+                .setPositional(true)
+                .setRequired(true)
+                .setNArgs("?")
+                .setHelpMessage("required dest positional")
+                .build());
+
+        parser.parse(arguments); //if fails, will throw validateException
+
+        List<Object> flag1 = new ArrayList<Object>(parser.getArgument("flag1").getValue());
+        List<Object> flag2 = new ArrayList<Object>(parser.getArgument("flag2").getValue());
+        List<Object> flag3 = new ArrayList<Object>(parser.getArgument("flag3").getValue());
+        List<Object> source = new ArrayList<Object>(parser.getArgument("source").getValue());
+        List<Object> dest = new ArrayList<Object>(parser.getArgument("dest").getValue());
+        return Map.of("flag1", flag1, "flag2", flag2, "flag3", flag3, "source", source, "dest", dest);
     }
 
     /**
@@ -136,23 +335,6 @@ public class Scenarios {
      *       this as a non-optional decimal value using a default of 0.0.
      *  - {@code right: <your decimal type>} (required)
      */
-//    static  Map<String, Object> validate(String arguments) throws ValidationException {
-//        /**
-//        *    function has following structure
-//        *    validate [--flag=[args]] pattern
-//        */
-//        var args = arguments.split(" ");
-//        if(args.length > 2){
-//            throw new ValidationException("passing in too many arguments");
-//        }
-//        Map<String, Object> res = new HashMap<>();
-//        if(args[0].matches("^--flag=")){
-//            var flagArgs = args[0].replaceFirst("^--flag=", "");
-//            res.put("flag", flagArgs.split("")),
-//        }
-//
-//        return Map.of("flag", "flag", "pattern", "HI");
-//    }
 
 
 }

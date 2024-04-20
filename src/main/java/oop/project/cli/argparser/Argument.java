@@ -1,20 +1,21 @@
 package oop.project.cli.argparser;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 
-public class Argument {
+public class Argument <T>{
     public final String[] names;
     public final String ref;
-    public final Object type;
-    public final IRange<Type> range;
+    public final Class<T> type;
+    public final IRange<T> range;
     public final String nArgs;
     public final String helpMessage;
     public final String helpName;
     public final boolean required;
     public final boolean positional; // might not be necessary?
-    public String value;
 
-    public Argument(ArgumentBuilder builder) {
+    ArrayList<T> value;
+    public Argument(ArgumentBuilder<T> builder) {
         names = builder.names;
         ref = builder.ref;
         type = builder.type;
@@ -25,10 +26,10 @@ public class Argument {
         required = builder.required;
         positional = builder.positional;
 
-        value = "";  // Default value is blank...might not be the best design
+        value = new ArrayList<>();
     }
 
-    public String getValue() {
+    public ArrayList<T> getValue() {
         return value;
     }
 }

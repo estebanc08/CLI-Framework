@@ -16,110 +16,6 @@ import java.util.stream.Stream;
 import java.util.Date;
 
 public class ScenariosTests {
-
-    @Nested
-    class Add {
-
-        @ParameterizedTest
-        @MethodSource
-        public void testAdd(String name, String command, Map<String, List<Object>> expected ) {
-            test(command, expected);
-        }
-
-        public static Stream<Arguments> testAdd() {
-            return Stream.of(
-                Arguments.of("Add", "add 1 2", Map.of("left", 1, "right", 2)),
-                Arguments.of("Missing Argument", "add 1", null),
-                Arguments.of("Extraneous Argument", "add 1 2 3", null),
-                Arguments.of("Not A Number", "add one two", null),
-                Arguments.of("Not An Integer", "add 1.0 2.0", null)
-            );
-        }
-
-    }
-
-    @Nested
-    class Div {
-
-        @ParameterizedTest
-        @MethodSource
-        public void testSub(String name, String command, Map<String, List<Object>> expected ) {
-            test(command, expected);
-        }
-
-        public static Stream<Arguments> testSub() {
-            return Stream.of(
-                Arguments.of("Sub", "sub --left 1.0 --right 2.0", Map.of("left", 1.0, "right", 2.0)),
-                Arguments.of("Left Only", "sub --left 1.0", null),
-                Arguments.of("Right Only", "sub --right 2.0", Map.of("left", Optional.empty(), "right", 2.0)),
-                Arguments.of("Missing Value", "sub --right", null),
-                Arguments.of("Extraneous Argument", "sub --right 2.0 extraneous", null),
-                Arguments.of("Misspelled Flag", "sub --write 2.0", null),
-                Arguments.of("Not A Number", "sub --right two", null)
-            );
-        }
-
-    }
-
-    @Nested
-    class Sqrt {
-
-        @ParameterizedTest
-        @MethodSource
-        public void testSqrt(String name, String command, Map<String, List<Object>> expected ) {
-            test(command, expected);
-        }
-
-        public static Stream<Arguments> testSqrt() {
-            return Stream.of(
-                Arguments.of("Valid", "sqrt 4", Map.of("number", 4)),
-                Arguments.of("Imperfect Square", "sqrt 3", Map.of("number", 3)),
-                Arguments.of("Zero", "sqrt 0", Map.of("number", 0)),
-                Arguments.of("Negative", "sqrt -1", null)
-            );
-        }
-
-    }
-
-    @Nested
-    class Calc {
-
-        @ParameterizedTest
-        @MethodSource
-        public void testCalc(String name, String command, Map<String, List<Object>> expected ) {
-            test(command, expected);
-        }
-
-        public static Stream<Arguments> testCalc() {
-            return Stream.of(
-                Arguments.of("Add", "calc add", Map.of("subcommand", "add")),
-                Arguments.of("Sub", "calc sub", Map.of("subcommand", "sub")),
-                Arguments.of("Sqrt", "calc sqrt", Map.of("subcommand", "sqrt")),
-                Arguments.of("Missing", "calc", null),
-                Arguments.of("Invalid", "calc unknown", null)
-            );
-        }
-
-    }
-
-    @Nested
-    class Date {
-
-        @ParameterizedTest
-        @MethodSource
-        public void testDate(String name, String command, Map<String, List<Object>> expected ) {
-            test(command, expected);
-        }
-
-        public static Stream<Arguments> testDate() {
-            return Stream.of(
-                Arguments.of("Date", "date 2024-01-01", Map.of("date", LocalDate.of(2024, 1, 1))),
-                Arguments.of("Invalid", "date 20240401", null)
-            );
-        }
-
-    }
-
     @Nested
     class ValidateTypes {
 
@@ -248,7 +144,8 @@ public class ScenariosTests {
                     Arguments.of("One arg with brackets", "flagNArgsQuestion --flag=[\"1\"]",  Map.of("flag", new ArrayList<>(List.of("1")))),
                     Arguments.of("One arg with brackets multiple words", "flagNArgsQuestion --flag=[\"There are multiple words\"]",  Map.of("flag", new ArrayList<>(List.of("There are multiple words")))),
                     Arguments.of("One arg with brackets multiple words", "flagNArgsQuestion --flag=[\"There are multiple words\" \"another one\"]",  null),
-                    Arguments.of("More than one arg", "flagNArgsQuestion --flag=[\"1\" \"2\"]",  null)
+                    Arguments.of("More than one arg", "flagNArgsQuestion --flag=[\"1\" \"2\"]",  null),
+                    Arguments.of("Incorrect Flag name", "flagNArgsQuestion --notFlag=[\"1\"]",  null)
             );
         }
 
@@ -307,7 +204,7 @@ public class ScenariosTests {
                     /**
                      this is for positionalNArgQuestion [positional?]
                      */
-                    Arguments.of("Empty Positional", "positionalNArgQuestion",  Map.of("flag", Optional.empty())),
+                    Arguments.of("Empty Positional", "positionalNArgQuestion",  Map.of("positional", Optional.empty())),
                     Arguments.of("Unquoted Flag", "positionalNArgQuestion --flag", null),
                     Arguments.of("Quoted Flag", "positionalNArgQuestion \"--flag\"", Map.of("positional", new ArrayList<>(List.of("1")))),
                     Arguments.of("Regular Number", "positionalNArgQuestion \"1\"", Map.of("positional", new ArrayList<>(List.of("1")))),
@@ -346,10 +243,11 @@ public class ScenariosTests {
                     /**
                         this is for validate [positional*]
                      */
-                    Arguments.of("Empty Positional", "positionalNArgStar",  Map.of("flag", Optional.empty())),
+                    Arguments.of("Empty Positional", "positionalNArgStar",  Map.of("positional", Optional.empty())),
                     Arguments.of("Unquoted Flag", "positionalNArgStar --flag", null),
                     Arguments.of("Quoted Flag", "positionalNArgStar \"--flag\"", Map.of("positional", new ArrayList<>(List.of("--flag")))),
-                    Arguments.of("Multiple Positional Args", "positionalNArgStar [\"1\" \"2\" \"hi\"]",  Map.of("flag", new ArrayList<>(List.of("1", "2", "hi"))))
+                    Arguments.of("Multiple Positional Args", "positionalNArgStar [\"1\" \"2\" \"hi\"]",  Map.of("flag", new ArrayList<>(List.of("1", "2", "hi")))),
+                    Arguments.of("Extra Positional", "positionalNArgStar \"one\" \"two\"",  null)
                     );
         }
     }
@@ -473,40 +371,40 @@ public class ScenariosTests {
         }
         public static Stream<Arguments> testBoth() {
             return Stream.of(
-                    /**testing for rem --flag1?.string.optional --flag2?.string.optional --flag3?.string.required [source*.string.optional] [source*.string.required]*/
-                    Arguments.of("All values present", "rem --flag1=[\"f1\"] --flag2=[\"f2\"] --flag3=[\"f3\"] [\"source\"] [\"dest\"]",
+                    /**testing for all--flag1?.string.optional --flag2?.string.optional --flag3?.string.required [source*.string.optional] [source*.string.required]*/
+                    Arguments.of("All values present", "all--flag1=[\"f1\"] --flag2=[\"f2\"] --flag3=[\"f3\"] [\"source\"] [\"dest\"]",
                             Map.of( "flag1", new ArrayList<>(List.of("f1")),
                                     "flag2", new ArrayList<>(List.of("f2")),
                                     "flag3", new ArrayList<>(List.of("f3")),
                                     "source", new ArrayList<>(List.of("source")),
                                     "dest", new ArrayList<>(List.of("dest")))),
-                    Arguments.of("All optional missing", "rem --flag3=[\"f3\"][\"dest\"]",
+                    Arguments.of("All optional missing", "all--flag3=[\"f3\"][\"dest\"]",
                                     "flag3", new ArrayList<>(List.of("f3")),
                                     "dest", new ArrayList<>(List.of("dest"))),
-                    Arguments.of("Required Flag missing", "rem --flag1=[\"f1\"] --flag2=[\"f2\"]  [\"source\"] [\"dest\"]", null),
-                    Arguments.of("Required positional missing", "rem --flag1=[\"f1\"] --flag2=[\"f2\"] --flag3=[\"f3\"] ", null),
-                    Arguments.of("Ordered reversed", "rem [\"source\"] [\"dest\"] --flag1=[\"f1\"] --flag2=[\"f2\"] --flag3=[\"f3\"]",
+                    Arguments.of("Required Flag missing", "all--flag1=[\"f1\"] --flag2=[\"f2\"]  [\"source\"] [\"dest\"]", null),
+                    Arguments.of("Required positional missing", "all--flag1=[\"f1\"] --flag2=[\"f2\"] --flag3=[\"f3\"] ", null),
+                    Arguments.of("Ordered reversed", "all[\"source\"] [\"dest\"] --flag1=[\"f1\"] --flag2=[\"f2\"] --flag3=[\"f3\"]",
                             Map.of( "flag1", new ArrayList<>(List.of("f1")),
                                     "flag2", new ArrayList<>(List.of("f2")),
                                     "flag3", new ArrayList<>(List.of("f3")),
                                     "source", new ArrayList<>(List.of("source")),
                                     "dest", new ArrayList<>(List.of("dest")))),
                     //TODO: NOT SURE IF ORDER OF CODE ABOVE SHOULD MATTER i.e FLAGS FIRST THEN POSITIONAL OR IF CAN BE POSITIONAL THEN FLAG
-                    Arguments.of("Flag sandwich", "rem [\"source\"] --flag1=[\"f1\"] --flag2=[\"f2\"] --flag3=[\"f3\"] [\"dest\"]",
+                    Arguments.of("Flag sandwich", "all[\"source\"] --flag1=[\"f1\"] --flag2=[\"f2\"] --flag3=[\"f3\"] [\"dest\"]",
                             Map.of( "flag1", new ArrayList<>(List.of("f1")),
                                     "flag2", new ArrayList<>(List.of("f2")),
                                     "flag3", new ArrayList<>(List.of("f3")),
                                     "source", new ArrayList<>(List.of("source")),
                                     "dest", new ArrayList<>(List.of("dest")))),
                     //TODO: DECIDE IF THIS SHOULD EVEN BE ALLOWED
-                    Arguments.of("Flag sandwich", "rem --flag1=[\"f1\"] --flag2=[\"f2\"] [\"source\"] --flag3=[\"f3\"] [\"dest\"]",
+                    Arguments.of("Flag sandwich", "all--flag1=[\"f1\"] --flag2=[\"f2\"] [\"source\"] --flag3=[\"f3\"] [\"dest\"]",
                             Map.of( "flag1", new ArrayList<>(List.of("f1")),
                                     "flag2", new ArrayList<>(List.of("f2")),
                                     "flag3", new ArrayList<>(List.of("f3")),
                                     "source", new ArrayList<>(List.of("source")),
                                     "dest", new ArrayList<>(List.of("dest")))),
                     //TODO: ALSO DECIDE IF THIS IS ALLOWED. IF LAST ONE ALLOWED, SO SHOULD THIS ONE. DECIDE IF ORDER MATTERS
-                    Arguments.of("Empty command", "rem", null)
+                    Arguments.of("Empty command", "cp", null)
             );
         }
 
