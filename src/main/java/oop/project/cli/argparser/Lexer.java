@@ -8,15 +8,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Lexer {
+public final class Lexer {
 
     private final CharStream chars;
-    Lexer(String input) {
+    public Lexer(String input) {
         chars = new CharStream(input);
     }
 
 
-    ArrayList<ArgToken> lex() {
+    public ArrayList<ArgToken> lex() {
         var tokens = new ArrayList<ArgToken>();
         while(chars.has(0)){
             while (chars.has(0) && match("[ ]")) {} //git rid of whitespace between words
