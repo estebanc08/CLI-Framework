@@ -2,8 +2,10 @@ package oop.project.cli.argparser;
 
 import com.google.common.io.CharStreams;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Lexer {
@@ -21,7 +23,7 @@ public class Lexer {
             if(peek("[\\.0-9\"\\[]") || peek("[\\-]", "[\\.0-9]")){
                 tokens.add(new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", lexPositional()));
             }else if(peek("\\-" , "[a-zA-Z]") || peek("[\\-]", "[\\-]", "[a-zA-Z]")){
-                tokens.add(lexNamed());
+                tokens.addAll(lexNamed());
             }else{
                 throw new ParseException("Not a valid positional value, named argument, or flag");
             }
@@ -104,7 +106,8 @@ public class Lexer {
         / By return vals instead of argtoken, can reuse structure for lexNamed that does --flag=[], --flag=1 or --flag="word"*/
     };
 
-    private ArgToken lexNamed(){
+    private ArrayList<ArgToken> lexNamed(){
+        ArrayList<ArgToken> tokens = new ArrayList<ArgToken>();
         ArrayList<Object> vals = new ArrayList<>();
         StringBuilder name = new StringBuilder();
         if(peek("[\\-]", "[\\-]", "[a-zA-Z]")){ // --flag
@@ -115,15 +118,19 @@ public class Lexer {
             }
             if(match("=")){
                 vals.addAll(lexPositional());
+                tokens.add(new ArgToken(ArgToken.Type.NAMED_ARG, name.toString(), vals));
+                return tokens;
+            }else{
+                tokens.add(new ArgToken(ArgToken.Type.FLAG, name.toString(), vals));
+                return tokens;
             }
-            return new ArgToken(ArgToken.Type.NAMED_ARG, name.toString(), vals);
         }else { //flag with one -
             chars.advance(1);
-            name.append(chars.get(0));
-            chars.advance(1);
-            if(!peek("[ \n\r]"))
-                throw new ParseException("Flag name with single dash cannot be greater than one character"); //TODO: Decide if we want to allow for flag combinations
-            return new ArgToken(ArgToken.Type.FLAG, name.toString(), vals);
+            while(chars.has(0) && peek("[a-zA-Z]")) {
+                tokens.add(new ArgToken(ArgToken.Type.FLAG, String.valueOf(chars.get(0)), vals));
+                chars.advance(1);
+            }
+            return tokens;
         }
     };
 
