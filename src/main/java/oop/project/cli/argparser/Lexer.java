@@ -50,7 +50,7 @@ public class Lexer {
         return curr.toString();
     }
 
-    private BigDecimal lexNumber(){ //will store all numbers as decimals and later check if expecting int that number is valid int
+    private Object lexNumber(){ //will store all numbers as decimals and later check if expecting int that number is valid int
         StringBuilder curr = new StringBuilder();
         if (peek("-", "[0-9]") || peek("-", "\\.", "[0-9]")) {
             curr.append(chars.get(0));
@@ -61,7 +61,10 @@ public class Lexer {
             chars.advance(1);
         }
         try{
-            return new BigDecimal(curr.toString());
+            var res = new BigDecimal(curr.toString());
+            if(res.scale() <= 0)
+                return res.toBigInteger();
+            else return res;
         }catch(Exception e){
             throw new ParseException("Invalid number value");
         }
@@ -97,7 +100,9 @@ public class Lexer {
         }else{ // lexing string or number
             vals.add(lexObject());
         }
-        System.out.println(vals);
+        for(var curr : vals){
+            System.out.println("Val: " + curr + "\tClass: " + curr.getClass() );
+        }
         return new ArgToken(ArgToken.Type.POSITIONAL_ARG, vals);
     };
 
