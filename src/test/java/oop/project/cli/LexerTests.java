@@ -117,12 +117,12 @@ public class LexerTests {
         public static Stream<Arguments> testFlags() {
             return Stream.of(
                     Arguments.of("Single Flag", "--flag", new ArrayList<>(List.of(
-                            new ArgToken(ArgToken.Type.FLAG, "flag", new ArrayList<>())))),
+                            new ArgToken(ArgToken.Type.FLAG, "--flag", new ArrayList<>())))),
                     Arguments.of("Flag with Value", "--flag=\"value\"", new ArrayList<>(List.of(
-                            new ArgToken(ArgToken.Type.NAMED_ARG, "flag", new ArrayList<>(List.of("value")))))),
+                            new ArgToken(ArgToken.Type.NAMED_ARG, "--flag", new ArrayList<>(List.of("value")))))),
                     Arguments.of("Multiple Flags", "--flag1 --flag2=\"value2\"", new ArrayList<>(List.of(
-                            new ArgToken(ArgToken.Type.FLAG, "flag1", new ArrayList<>()),
-                            new ArgToken(ArgToken.Type.NAMED_ARG, "flag2", new ArrayList<>(List.of("value2"))))))
+                            new ArgToken(ArgToken.Type.FLAG, "--flag1", new ArrayList<>()),
+                            new ArgToken(ArgToken.Type.NAMED_ARG, "--flag2", new ArrayList<>(List.of("value2"))))))
             );
         }
     }
@@ -139,13 +139,13 @@ public class LexerTests {
         public static Stream<Arguments> testNamedArgs() {
             return Stream.of(
                     Arguments.of("Single Named Argument", "--name=\"value\"", new ArrayList<>(List.of(
-                            new ArgToken(ArgToken.Type.NAMED_ARG, "name", new ArrayList<>(List.of("value")))))),
+                            new ArgToken(ArgToken.Type.NAMED_ARG, "--name", new ArrayList<>(List.of("value")))))),
                     Arguments.of("Multiple Named Arguments", "--name1=\"value1\" --name2=2", new ArrayList<>(List.of(
-                            new ArgToken(ArgToken.Type.NAMED_ARG, "name1", new ArrayList<>(List.of("value1"))),
-                            new ArgToken(ArgToken.Type.NAMED_ARG, "name2", new ArrayList<>(List.of(new BigInteger("2"))))))),
+                            new ArgToken(ArgToken.Type.NAMED_ARG, "--name1", new ArrayList<>(List.of("value1"))),
+                            new ArgToken(ArgToken.Type.NAMED_ARG, "--name2", new ArrayList<>(List.of(new BigInteger("2"))))))),
                     Arguments.of("Invalid Named Argument", "--=value", null),
                     Arguments.of("Named Argument with Array Value", "--name3=[1 2 3 4]", new ArrayList<>(List.of(
-                            new ArgToken(ArgToken.Type.NAMED_ARG, "name3", new ArrayList<>(List.of(new BigInteger("1"), new BigInteger("2"), new BigInteger("3"), new BigInteger("4")))))))
+                            new ArgToken(ArgToken.Type.NAMED_ARG, "--name3", new ArrayList<>(List.of(new BigInteger("1"), new BigInteger("2"), new BigInteger("3"), new BigInteger("4")))))))
             );
         }
     }
