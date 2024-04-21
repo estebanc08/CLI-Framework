@@ -314,6 +314,7 @@ public class Scenarios {
                 .setPositional(true)
                 .setRequired(true)
                 .setNArgs("?")
+                .setHelpName("HELP NAME")
                 .setHelpMessage("required dest positional")
                 .build());
 

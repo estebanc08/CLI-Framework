@@ -13,7 +13,9 @@ public class Validator {
      * @param arguments List of arguments defined for the parser.
      * @throws ValidationException if validation fails.
      */
-    public static void validate(ArrayList<ArgToken> tokens, ArrayList<Argument> arguments) throws ValidationException {
+    static MappedData data = null;
+    public static void validate(ArrayList<ArgToken> tokens, ArrayList<Argument> arguments, MappedData _data) throws ValidationException {
+        data = _data;
         for (ArgToken token : tokens) {
             Argument argument = findArgument(token.name(), arguments);
             if (argument == null) {
@@ -52,7 +54,6 @@ public class Validator {
      * @throws ValidationException if validation fails.
      */
     private static void validateToken(ArgToken token, Argument argument) throws ValidationException {
-        System.out.println(token + " " +  argument);
         // Perform validation based on the type of argument
         if(argument.positional){
             validatePositionalArgument(token, argument);
@@ -68,10 +69,48 @@ public class Validator {
     }
 
     private static void validateNamedArgument(ArgToken token, Argument argument) throws ValidationException {
+        if(argument.ref.equals("help")){
+            invokeHelp();
+        }
         throw new NotImplementedException("validate named not done");
     }
 
     private static void validateFlag(ArgToken token, Argument argument) throws ValidationException {
         throw new NotImplementedException("validate flag not done");
+    }
+
+    private static void invokeHelp() {
+        System.out.print("Usage: " );
+        StringBuilder positionals = new StringBuilder();
+        int optional = 0;
+        for(var entry : data.map.entrySet()){
+            var value = entry.getValue();
+            if(value.positional){
+                var name = value.helpName == null ? value.ref : value.helpName;
+                positionals.append("[").append(name).append("] ");
+            }else{
+                if(!value.required){
+                    optional++;
+                    continue;
+                }
+                var name = value.helpName == null ? value.names[0] : value.helpName;
+                System.out.print("< " + name + " > ");
+            }
+        }
+        if(optional > 0) System.out.print("< options > ");
+        System.out.println(positionals + "\nOptions:");
+
+        for(var entry : data.map.entrySet()) {
+            var value = entry.getValue();
+            if(!value.positional && !value.ref.equals("help")){
+                for (int i = 0; i < value.names.length; i++) {
+                    System.out.print(value.names[i]);
+                    if (i < value.names.length - 1) System.out.print(", ");
+                }
+                if(value.helpMessage != null)
+                    System.out.print("\t\t" + value.helpMessage);
+                System.out.println();
+            }
+        }
     }
 }
