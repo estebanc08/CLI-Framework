@@ -32,10 +32,12 @@ public class LexerTests {
                             new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", new ArrayList<>(List.of("string")))))),
                     Arguments.of("Multi word string", "\"string with spaces\"", new ArrayList<>(List.of(
                             new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", new ArrayList<>(List.of("string with spaces")))))),
+                    //"string 1 'string2'"
                     Arguments.of("Nested single quote", "\"string1 'string2'\"", new ArrayList<>(List.of(
                             new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", new ArrayList<>(List.of("string1 'string2'")))))),
+                    //"string 1 "string2""
                     Arguments.of("Nested double quotes", "\"string1 \\\"string2\\\"\"", new ArrayList<>(List.of(
-                            new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", new ArrayList<>(List.of("string1 \\\"string2\\\"")))))),
+                            new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", new ArrayList<>(List.of("string1 \"string2\"")))))),
                     Arguments.of("Missing Quotes", "string", null),
                     Arguments.of("Missing first Quote", "string\"", null),
                     Arguments.of("Missing last Quote", "\"string", null),

@@ -36,18 +36,24 @@ public final class Lexer {
         return tokens;
     }
 
-    private String lexString(){
+    private String lexString() {
         StringBuilder curr = new StringBuilder();
         match("\"");
         while (chars.has(0)) {
             char currentChar = chars.get(0);
-            if (currentChar == '\\') { //escape chars
-                curr.append(currentChar);
+            if (currentChar == '\\') { // Handle escape characters
                 if (chars.has(1)) {
-                    curr.append(chars.get(1));
-                    chars.advance(2);
+                    char nextChar = chars.get(1);
+                    if (nextChar == '"' || nextChar == '\\') {
+                        curr.append(nextChar);
+                        chars.advance(2);
+                    } else {
+                        throw new ParseException("Invalid escape sequence: \\" + nextChar);
+                    }
+                } else {
+                    throw new ParseException("Invalid escape character at end of input");
                 }
-            } else if (currentChar == '"') {
+            } else if (currentChar == '"') { // Handle nested quotes
                 if (chars.has(1) && chars.get(1) == '"') {
                     curr.append("\"");
                     chars.advance(2);
@@ -59,12 +65,15 @@ public final class Lexer {
                 chars.advance(1);
             }
         }
-        if(peek("\""))
+        if (peek("\"")) {
             chars.advance(1);
-        else
-            throw new ParseException("Need quotation at end of string");
+        } else {
+            throw new ParseException("Missing closing quotation mark");
+        }
         return curr.toString();
     }
+
+
 
 
     private Object lexNumber(){ //will store all numbers as decimals and later check if expecting int that number is valid int
