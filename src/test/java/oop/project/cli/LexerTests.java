@@ -47,7 +47,7 @@ public class LexerTests {
                     Arguments.of("Missing last Quote - spaced out", "\"string1 string2", null),
                     Arguments.of("Empty String", "\"\"",
                             new ArrayList<>(List.of(new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", new ArrayList<>(List.of("")))))),
-                    Arguments.of("String With Whitespace", "\"  string  \t\"",
+                    Arguments.of("String With Whitespace", "\"  string  \\t\"",
                             new ArrayList<>(List.of(new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", new ArrayList<>(List.of("  string  \t")))))), //TODO i dont know why its adding a singular random extra whitespace help
                     Arguments.of("String with Escaped Characters", "\"\\t\\n\"",
                             new ArrayList<>(List.of(new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", new ArrayList<>(List.of("\t\n"))))))

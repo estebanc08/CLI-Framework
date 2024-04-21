@@ -13,6 +13,14 @@ public class ArgumentParser {
         this.programName = programName;
         this.description = description;
         this.namespace.map = new HashMap<>();
+        var helpFlag = new ArgumentBuilder<>(String.class, "help", "-h", "--help")
+                .setPositional(false)
+                .setRequired(false)
+                .setNArgs("0")
+                .setHelpMessage("temp help")
+                .build();
+        addArgument(helpFlag);
+        this.namespace.map.put(helpFlag.ref, helpFlag);
     }
 
     /**

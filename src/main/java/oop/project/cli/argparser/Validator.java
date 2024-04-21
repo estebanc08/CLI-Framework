@@ -31,9 +31,14 @@ public class Validator {
      * @return The argument with the given name, or null if not found.
      */
     private static Argument findArgument(String name, ArrayList<Argument> arguments) {
-        for (Argument argument : arguments) {
-            if (argument.ref.equals(name)) {
+        for (var argument : arguments) {
+            if(argument.ref.equals(name)){
                 return argument;
+            }
+            for(var currName : argument.names) {
+                if (currName.equals(name)) {
+                    return argument;
+                }
             }
         }
         return null;

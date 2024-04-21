@@ -139,6 +139,7 @@ public final class Lexer {
         StringBuilder name = new StringBuilder();
         if(peek("[\\-]", "[\\-]", "[a-zA-Z]")){ // --flag
             chars.advance(2);
+            name.append("--");
             while(chars.has(0) && peek("[a-zA-Z0-9_]")){
                 name.append(chars.get(0));
                 chars.advance(1);
@@ -154,7 +155,7 @@ public final class Lexer {
         }else { //flag with one -
             chars.advance(1);
             while(chars.has(0) && peek("[a-zA-Z]")) {
-                tokens.add(new ArgToken(ArgToken.Type.FLAG, String.valueOf(chars.get(0)), vals));
+                tokens.add(new ArgToken(ArgToken.Type.FLAG, "-" + chars.get(0), vals));
                 chars.advance(1);
             }
             return tokens;
@@ -222,6 +223,4 @@ public final class Lexer {
         }
 
     }
-
-
 }
