@@ -39,18 +39,33 @@ public final class Lexer {
     private String lexString(){
         StringBuilder curr = new StringBuilder();
         match("\"");
-        while (chars.has(0) && !peek("\"")) { // Read until the last "
-            if(peek("[\n\r]"))
-                throw new ParseException("Illegal New line in string");
-            curr.append(chars.get(0));
-            chars.advance(1);
+        while (chars.has(0)) {
+            char currentChar = chars.get(0);
+            if (currentChar == '\\') { //escape chars
+                curr.append(currentChar);
+                if (chars.has(1)) {
+                    curr.append(chars.get(1));
+                    chars.advance(2);
+                }
+            } else if (currentChar == '"') {
+                if (chars.has(1) && chars.get(1) == '"') {
+                    curr.append("\"");
+                    chars.advance(2);
+                } else {
+                    break;
+                }
+            } else {
+                curr.append(currentChar);
+                chars.advance(1);
+            }
         }
         if(peek("\""))
-            chars.advance(1); // Consume the last "
+            chars.advance(1);
         else
             throw new ParseException("Need quotation at end of string");
         return curr.toString();
     }
+
 
     private Object lexNumber(){ //will store all numbers as decimals and later check if expecting int that number is valid int
         StringBuilder curr = new StringBuilder();

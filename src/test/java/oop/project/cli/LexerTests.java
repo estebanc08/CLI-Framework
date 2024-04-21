@@ -35,7 +35,7 @@ public class LexerTests {
                     Arguments.of("Nested single quote", "\"string1 'string2'\"", new ArrayList<>(List.of(
                             new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", new ArrayList<>(List.of("string1 'string2'")))))),
                     Arguments.of("Nested double quotes", "\"string1 \\\"string2\\\"\"", new ArrayList<>(List.of(
-                            new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", new ArrayList<>(List.of("string1 \"string2\"")))))), //TODO FIX POSSIBLY
+                            new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", new ArrayList<>(List.of("string1 \\\"string2\\\"")))))),
                     Arguments.of("Missing Quotes", "string", null),
                     Arguments.of("Missing first Quote", "string\"", null),
                     Arguments.of("Missing last Quote", "\"string", null),
