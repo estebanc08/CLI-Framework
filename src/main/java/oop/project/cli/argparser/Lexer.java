@@ -30,9 +30,6 @@ public final class Lexer {
             if(chars.has(0) && !peek("[ ]"))
                 throw new ParseException("Required space between flags or positional values");
         }
-        for(var val : tokens){
-            System.out.println("VALUE: " + val);
-        }
         return tokens;
     }
 
