@@ -4,7 +4,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Argument <T>{
+public class Argument <T extends Comparable<T>>{
     public final String[] names;
     public final String ref;
     public final Class<T> type;
@@ -13,14 +13,14 @@ public class Argument <T>{
     public final String helpMessage;
     public final String helpName;
     public final boolean required;
-    public final boolean positional; // might not be necessary?
+    public final boolean positional;
+    public ArrayList<T> value;
 
-    ArrayList<T> value;
-    public Argument(ArgumentBuilder builder) {
+    public Argument(ArgumentBuilder<T> builder) {
         names = builder.names;
         ref = builder.ref;
-        type = (Class<T>) builder.type;  // unchecked but probably is ok..?
-        range = (IRange<T>) builder.range;
+        type = builder.type;
+        range = builder.range;
         nArgs = builder.nArgs;
         helpMessage = builder.helpMessage;
         helpName = builder.helpName;

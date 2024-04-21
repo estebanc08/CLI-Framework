@@ -53,7 +53,7 @@ public class Scenarios {
 
     static Map<String, List<Object>> string(String arguments) throws ValidationException {
         ArgumentParser parser = new ArgumentParser("string", "testing functionality of string parsing");
-        parser.addArgument(new ArgumentBuilder(String.class, "positional")
+        parser.addArgument(new ArgumentBuilder<>(String.class, "positional")
                 .setPositional(true)
                 .setRequired(false)
                 .setNArgs("*")
@@ -67,7 +67,7 @@ public class Scenarios {
 
     static  Map<String, List<Object>> ints(String arguments) throws ValidationException {
         ArgumentParser parser = new ArgumentParser("int", "testing functionality of int parsing");
-        parser.addArgument(new ArgumentBuilder(BigInteger.class, "positional")
+        parser.addArgument(new ArgumentBuilder<>(BigInteger.class, "positional")
                 .setPositional(true)
                 .setRequired(false)
                 .setNArgs("*")
@@ -81,7 +81,7 @@ public class Scenarios {
 
     static Map<String, List<Object>> decimal(String arguments)  throws ValidationException {
         ArgumentParser parser = new ArgumentParser("decimal", "testing functionality of decimal parsing");
-        parser.addArgument(new ArgumentBuilder(BigInteger.class, "positional")
+        parser.addArgument(new ArgumentBuilder<>(BigInteger.class, "positional")
                 .setPositional(true)
                 .setRequired(false)
                 .setNArgs("*")
@@ -95,7 +95,7 @@ public class Scenarios {
 
     static Map<String, List<Object>> date(String arguments) throws ValidationException {
         ArgumentParser parser = new ArgumentParser("date", "testing date parsing");
-        parser.addArgument(new ArgumentBuilder(Date.class, "positional")
+        parser.addArgument(new ArgumentBuilder<>(Date.class, "positional")
                 .setPositional(true)
                 .setRequired(true)
                 .setNArgs("*")
@@ -111,7 +111,7 @@ public class Scenarios {
     //TODO POSSIBLE BOOLEAN FLIP FOR NO ARGUMENTS
     static Map<String, List<Object>> noArgs(String arguments) throws ValidationException {
         ArgumentParser parser = new ArgumentParser("noArgs", "testing functionality of flag with no arguments parsing");
-        parser.addArgument(new ArgumentBuilder(String.class, "flag", "-f", "--flag")
+        parser.addArgument(new ArgumentBuilder<>(String.class, "flag", "-f", "--flag")
                 .setPositional(false)
                 .setRequired(true)
                 .setNArgs("?")
@@ -125,7 +125,7 @@ public class Scenarios {
 
     static Map<String, List<Object>> flagNArgsQuestion(String arguments)  throws ValidationException {
         ArgumentParser parser = new ArgumentParser("flagNArgsQuestion", "testing functionality of flag with ? args");
-        parser.addArgument(new ArgumentBuilder(String.class, "flag", "-f", "--flag")
+        parser.addArgument(new ArgumentBuilder<>(String.class, "flag", "-f", "--flag")
                 .setPositional(false)
                 .setRequired(true)
                 .setNArgs("?")
@@ -139,7 +139,7 @@ public class Scenarios {
 
     static Map<String, List<Object>> flagNArgsPlus(String arguments) throws ValidationException {
         ArgumentParser parser = new ArgumentParser("flagNArgsPlus", "testing functionality of flag with + args");
-        parser.addArgument(new ArgumentBuilder(String.class, "flag", "-f", "--flag")
+        parser.addArgument(new ArgumentBuilder<>(String.class, "flag", "-f", "--flag")
                 .setPositional(false)
                 .setRequired(true)
                 .setNArgs("+")
@@ -153,7 +153,7 @@ public class Scenarios {
 
     static Map<String, List<Object>> flagNArgsStar(String arguments)  throws ValidationException {
         ArgumentParser parser = new ArgumentParser("flagNArgsStar", "testing functionality of flag with * args");
-        parser.addArgument(new ArgumentBuilder(String.class, "flag", "-f", "--flag")
+        parser.addArgument(new ArgumentBuilder<>(String.class, "flag", "-f", "--flag")
                 .setPositional(false)
                 .setRequired(true)
                 .setNArgs("*")
@@ -168,7 +168,7 @@ public class Scenarios {
 
     static Map<String, List<Object>> positionalNArgsQuestion(String arguments)   throws ValidationException {
         ArgumentParser parser = new ArgumentParser("positionalNArgQuestion", "testing functionality of positional with ? args");
-        parser.addArgument(new ArgumentBuilder(String.class, "positional")
+        parser.addArgument(new ArgumentBuilder<>(String.class, "positional")
                 .setPositional(true)
                 .setRequired(true)
                 .setNArgs("?")
@@ -181,7 +181,7 @@ public class Scenarios {
     }
     static Map<String, List<Object>> positionalNArgsPlus(String arguments) throws ValidationException {
         ArgumentParser parser = new ArgumentParser("positionalNArgQuestion", "testing functionality of positional with + args");
-        parser.addArgument(new ArgumentBuilder(String.class, "positional")
+        parser.addArgument(new ArgumentBuilder<>(String.class, "positional")
                 .setPositional(true)
                 .setRequired(true)
                 .setNArgs("+")
@@ -195,7 +195,7 @@ public class Scenarios {
 
     static Map<String, List<Object>> positionalNArgsStar(String arguments) throws ValidationException {
         ArgumentParser parser = new ArgumentParser("positionalNArgsStar", "testing functionality of positional with * args");
-        parser.addArgument(new ArgumentBuilder(String.class, "positional")
+        parser.addArgument(new ArgumentBuilder<>(String.class, "positional")
                 .setPositional(true)
                 .setRequired(true)
                 .setNArgs("*")
@@ -208,7 +208,7 @@ public class Scenarios {
     }
     static Map<String, List<Object>> requiredFalse(String arguments)  throws ValidationException {
         ArgumentParser parser = new ArgumentParser("requiredFalse", "testing functionality required false");
-        parser.addArgument(new ArgumentBuilder(String.class, "positional")
+        parser.addArgument(new ArgumentBuilder<>(String.class, "positional")
                 .setPositional(true)
                 .setRequired(false)
                 .setNArgs("*")
@@ -221,7 +221,7 @@ public class Scenarios {
     }
     static Map<String, List<Object>> requiredTrue(String arguments) throws ValidationException {
         ArgumentParser parser = new ArgumentParser("requiredTrue", "testing functionality required true");
-        parser.addArgument(new ArgumentBuilder(String.class, "positional")
+        parser.addArgument(new ArgumentBuilder<>(String.class, "positional")
                 .setPositional(true)
                 .setRequired(true)
                 .setNArgs("*")
@@ -235,14 +235,14 @@ public class Scenarios {
 
     static Map<String, List<Object>> multFlags(String arguments) throws ValidationException {
         ArgumentParser parser = new ArgumentParser("multFlags", "testing functionality for multiple flags");
-        parser.addArgument(new ArgumentBuilder(String.class, "flag1", "-f1", "--flag1")
+        parser.addArgument(new ArgumentBuilder<>(String.class, "flag1", "-f1", "--flag1")
                 .setPositional(false)
                 .setRequired(true)
                 .setNArgs("*")
                 .setHelpMessage("required string flag")
                 .build());
 
-        parser.addArgument(new ArgumentBuilder(BigInteger.class, "flag2", "-f2", "--flag2")
+        parser.addArgument(new ArgumentBuilder<>(BigInteger.class, "flag2", "-f2", "--flag2")
                 .setPositional(false)
                 .setRequired(false)
                 .setNArgs("*")
@@ -258,14 +258,14 @@ public class Scenarios {
 
     static Map<String, List<Object>> multPos(String arguments) throws ValidationException {
         ArgumentParser parser = new ArgumentParser("multPos", "testing functionality for multiple positionals");
-        parser.addArgument(new ArgumentBuilder(String.class, "source")
+        parser.addArgument(new ArgumentBuilder<>(String.class, "source")
                 .setPositional(true)
                 .setRequired(false)
                 .setNArgs("*")
                 .setHelpMessage("optional dest positional")
                 .build());
 
-        parser.addArgument(new ArgumentBuilder(String.class, "dest")
+        parser.addArgument(new ArgumentBuilder<>(String.class, "dest")
                 .setPositional(true)
                 .setRequired(true)
                 .setNArgs("?")
@@ -282,35 +282,35 @@ public class Scenarios {
     static Map<String, List<Object>> all(String arguments) throws ValidationException {
         ArgumentParser parser = new ArgumentParser("all", "testing functionality for multiple positionals");
 
-        parser.addArgument(new ArgumentBuilder(String.class, "flag1", "-f1", "--flag1")
+        parser.addArgument(new ArgumentBuilder<>(String.class, "flag1", "-f1", "--flag1")
                 .setPositional(false)
                 .setRequired(false)
                 .setNArgs("?")
                 .setHelpMessage("optional string flag")
                 .build());
 
-        parser.addArgument(new ArgumentBuilder(String.class, "flag2", "-f2", "--flag2")
+        parser.addArgument(new ArgumentBuilder<>(String.class, "flag2", "-f2", "--flag2")
                 .setPositional(false)
                 .setRequired(false)
                 .setNArgs("?")
                 .setHelpMessage("optional string flag")
                 .build());
 
-        parser.addArgument(new ArgumentBuilder(String.class, "flag3", "-f3", "--flag3")
+        parser.addArgument(new ArgumentBuilder<>(String.class, "flag3", "-f3", "--flag3")
                 .setPositional(false)
                 .setRequired(true)
                 .setNArgs("?")
                 .setHelpMessage("required string flag")
                 .build());
 
-        parser.addArgument(new ArgumentBuilder(String.class, "source")
+        parser.addArgument(new ArgumentBuilder<>(String.class, "source")
                 .setPositional(true)
                 .setRequired(false)
                 .setNArgs("*")
                 .setHelpMessage("optional dest positional")
                 .build());
 
-        parser.addArgument(new ArgumentBuilder(String.class, "dest")
+        parser.addArgument(new ArgumentBuilder<>(String.class, "dest")
                 .setPositional(true)
                 .setRequired(true)
                 .setNArgs("?")

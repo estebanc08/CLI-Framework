@@ -16,7 +16,7 @@ public class ArgumentParser {
         this.programName = programName;
         this.description = description;
         this.namespace.map = new HashMap<>();
-        var helpFlag = new ArgumentBuilder(String.class, "help", "-h", "--help")
+        var helpFlag = new ArgumentBuilder<>(String.class, "help", "-h", "--help")
                 .setPositional(false)
                 .setRequired(false)
                 .setNArgs("0")

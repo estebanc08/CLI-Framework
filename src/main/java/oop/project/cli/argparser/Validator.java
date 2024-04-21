@@ -1,7 +1,10 @@
 package oop.project.cli.argparser;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 
 import static oop.project.cli.argparser.ArgToken.Type.NAMED_ARG;
@@ -63,12 +66,24 @@ public class Validator {
         // Store and verify that this token's name is valid
         String name = token.name();
         if (consumedArguments.contains(name)) { throw new ValidationException("Duplicate definition for " + name + "."); }
-        if (findArgument(name) == null) { throw new ValidationException("No such argument " + name + " found."); }
+
+        // Get the argument, verify that it exists
+        var argument = findArgument(name);
+        if (argument == null) { throw new ValidationException("No such argument " + name + " found."); }
+
+        // Validate its range
+        try { validateObject(argument); }
+        catch (Exception e) { throw new ValidationException("Unexpected type " + argument.type.toString()); }
+
         consumedArguments.add(name);
-
-
-
         throw new NotImplementedException("validate named not done");
+    }
+
+    private <U extends Comparable<U>> void validateObject(Argument<U> argument) throws ValidationException {
+        for (var val : argument.value) {
+            if (!argument.range.isInRange(val))
+            { throw new ValidationException(val + " is not in range" + argument.range.toString()); }
+        }
     }
 
     private static void validateFlag(ArgToken token, Argument argument) throws ValidationException {

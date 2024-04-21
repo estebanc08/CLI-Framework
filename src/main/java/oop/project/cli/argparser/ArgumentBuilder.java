@@ -1,18 +1,15 @@
 package oop.project.cli.argparser;
 
-import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 
-public class ArgumentBuilder {
+public class ArgumentBuilder<T extends Comparable<T>> {
     protected String[] names;
     protected String ref;
-    protected Class<?> type;  // note: we may need to change this
-    protected IRange<Comparable<?>> range;  // also this too :(
+    protected Class<T> type;  // note: we may need to change this
+    protected IRange<T> range;  // also this too :(
     protected String nArgs;
     protected String helpMessage;
     protected String helpName;
@@ -31,7 +28,7 @@ public class ArgumentBuilder {
         return s.matches(identifierPattern);
     }
 
-    public ArgumentBuilder(Class<?> type, String ref, String... names) {
+    public ArgumentBuilder(Class<T> type, String ref, String... names) {
         Set<Class<?>> validTypes = new HashSet<>(Arrays.asList(
                 BigInteger.class,
                 BigDecimal.class,
@@ -62,11 +59,11 @@ public class ArgumentBuilder {
 
 
     // I honestly have no clue how we'll do type checking with IRange (or how java generics even work)
-    public ArgumentBuilder setRange(IRange<Comparable<?>> range) {
+    public ArgumentBuilder<T> setRange(IRange<T> range) {
         this.range = range;
         return this;
     }
-    public ArgumentBuilder setNArgs(String nArgs) {
+    public ArgumentBuilder<T> setNArgs(String nArgs) {
         String errorMessage = "Error: Invalid input to setNArgs. (Must be ?,*,+ or integer)";
         String nArgFlags = "?*+";
 
@@ -91,23 +88,23 @@ public class ArgumentBuilder {
         this.nArgs = nArgs;
         return this;
     }
-    public ArgumentBuilder setHelpMessage(String helpMessage) {
+    public ArgumentBuilder<T> setHelpMessage(String helpMessage) {
         this.helpMessage = helpMessage;
         return this;
     }
-    public ArgumentBuilder setHelpName(String helpName) {
+    public ArgumentBuilder<T> setHelpName(String helpName) {
         this.helpName = helpName;
         return this;
     }
-    public ArgumentBuilder setRequired(boolean required) {
+    public ArgumentBuilder<T> setRequired(boolean required) {
         this.required = required;
         return this;
     }
-    public ArgumentBuilder setPositional(boolean positional) {
+    public ArgumentBuilder<T> setPositional(boolean positional) {
         this.positional = true;
         return this;
     }
-    public Argument<?> build() {
+    public Argument<T> build() {
         return new Argument<>(this);
     }
 }
