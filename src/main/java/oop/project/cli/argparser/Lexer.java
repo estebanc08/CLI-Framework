@@ -134,7 +134,7 @@ public final class Lexer {
     };
 
     private ArrayList<ArgToken> lexNamed(){
-        ArrayList<ArgToken> tokens = new ArrayList<ArgToken>();
+        ArrayList<ArgToken> tokens = new ArrayList<>();
         ArrayList<Object> vals = new ArrayList<>();
         StringBuilder name = new StringBuilder();
         if(peek("[\\-]", "[\\-]", "[a-zA-Z]")){ // --flag
@@ -144,11 +144,12 @@ public final class Lexer {
                 name.append(chars.getNext());
                 chars.advance(1);
             }
-            if(match("=")){
+            if (match("=")){
                 vals.addAll(lexPositional());
                 tokens.add(new ArgToken(ArgToken.Type.NAMED_ARG, name.toString(), vals));
                 return tokens;
-            }else{
+            }
+            else {
                 tokens.add(new ArgToken(ArgToken.Type.FLAG, name.toString(), vals));
                 return tokens;
             }
@@ -162,9 +163,11 @@ public final class Lexer {
         }
     };
 
+    /** Given a list of regexes / characters, will peek forward that list's length and test each character against each regex.**/
     private boolean peek(Object... objects) {
+        if (!chars.has(objects.length - 1)) { return false; }
         for (var i = 0; i < objects.length; i++) {
-            if (!chars.has(i)  || !test(objects[i], chars.get(i))) {
+            if (!test(objects[i], chars.get(i))) {
                 return false;
             }
         }

@@ -1,7 +1,10 @@
 package oop.project.cli.argparser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ArgumentParser {
     private final String programName;
@@ -29,7 +32,12 @@ public class ArgumentParser {
      *
      * @param argument Argument to add to the parser.
      */
-    public void addArgument(Argument argument) {
+    public void addArgument(Argument<Object> argument) {
+        // If any overlap between this argument's names and other, previously defined arguments, throw error
+        var namespaceNames = arguments.stream().flatMap(arg -> Arrays.stream(arg.names)).toList();
+        if (Arrays.stream(argument.names).anyMatch(namespaceNames::contains)) {
+            throw new ParseException()
+        }
         arguments.add(argument);
         namespace.map.put(argument.ref, argument);
     }
