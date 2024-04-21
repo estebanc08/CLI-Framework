@@ -51,9 +51,6 @@ public class LexerTests {
                             new ArrayList<>(List.of(new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", new ArrayList<>(List.of("  string  ")))))), //TODO i dont know why its adding a singular random extra whitespace help
                     Arguments.of("String with Escaped Characters", "\"\\t\\n\"",
                             new ArrayList<>(List.of(new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", new ArrayList<>(List.of("\t\n"))))))
-
-
-
             );
         }
         @ParameterizedTest
@@ -74,7 +71,9 @@ public class LexerTests {
                     Arguments.of("Leading 0's", "00000000002", new ArrayList<>(List.of(
                             new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", new ArrayList<>(List.of(new BigInteger("2"))))))),
                     Arguments.of("Character in Number", "12a", null),
-                    Arguments.of("Character in Number Nested", "1a1", null)
+                    Arguments.of("Character in Number Nested", "1a1", null),
+                    Arguments.of("Multiple positional", "[1 2 3 4]", new ArrayList<>(List.of(
+                            new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", new ArrayList<>(List.of(new BigInteger("1"), new BigInteger("2"), new BigInteger("3"), new BigInteger("4")))))))
             );
         }
 
@@ -99,15 +98,16 @@ public class LexerTests {
                             new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", new ArrayList<>(List.of(new BigDecimal("-2147483650.123456789"))))))),
                     Arguments.of("Multiple decimals", "1.2.1", null),
                     Arguments.of("Character in Decimal", "12.a", null),
-                    Arguments.of("Character in Decimal Nested", "1.a1", null)
+                    Arguments.of("Character in Decimal Nested", "1.a1", null),
+                    Arguments.of("Multiple positional", "[1.1 2.2 3.3 4.4]", new ArrayList<>(List.of(
+                            new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", new ArrayList<>(List.of(new BigDecimal("1.1"), new BigDecimal("2.2"), new BigDecimal("3.3"), new BigDecimal("4.4")))))))
             );
         }
-
     }
 
     @Nested
     class FlagTests{
-        //TODO: ADD BASIC TEST CASES FOR FLAGS
+
         @ParameterizedTest
         @MethodSource
         public void testFlags(String name, String command, ArrayList<ArgToken> expected) {

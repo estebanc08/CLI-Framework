@@ -46,9 +46,9 @@ public final class Lexer {
                     char nextChar = chars.get(1);
                     if (nextChar == '"' || nextChar == '\\' || nextChar == 't' || nextChar == 'n') {
                         if (nextChar == 't') {
-                            curr.append('\t'); // Append tab character
+                            curr.append('\t');
                         } else if (nextChar == 'n') {
-                            curr.append('\n'); // Append newline character
+                            curr.append('\n');
                         } else {
                             curr.append(nextChar);
                         }
