@@ -6,12 +6,13 @@ import java.util.HashMap;
 public class ArgumentParser {
     private final String programName;
     public String description;
-    private final HashMap<String, Argument> namespace;
+    private final MappedData namespace = new MappedData();
+    ArrayList<Argument> arguments;
 
     public ArgumentParser(String programName, String description) {
         this.programName = programName;
         this.description = description;
-        this.namespace = new HashMap<>();
+        this.namespace.map = new HashMap<>();
     }
 
     /**
@@ -22,7 +23,8 @@ public class ArgumentParser {
      */
     public void addArgument(Argument argument) {
         // TODO: Add some logic for duplicate refs, maybe throw an error?
-        namespace.put(argument.ref, argument);
+        arguments.add(argument);
+        namespace.map.put(argument.ref, argument);
     }
 
     /**
@@ -32,7 +34,7 @@ public class ArgumentParser {
      * @return Argument associated with the string, or {@code null} if none exists.
      */
     public Argument getArgument(String ref) {
-        return namespace.get(ref);
+        return namespace.map.get(ref);
     }
 
     // TODO: Better docstring once we figure out how this function is going to work.
@@ -49,7 +51,7 @@ public class ArgumentParser {
     //          - How do we get input? Do we modify this method signature to take a string, or do we
     //              actually wait for IO in this method? I think waiting for IO makes the most sense, but
     //              we would have to properly document that so it doesn't surprise the user.
-    public void parse(String input) throws ValidationException{
+    public MappedData parse(String input) throws ValidationException{
         // TODO: Full end-to-end parsing, calling lex and validate
 //        try {
 //            validate(lex(input));
@@ -58,6 +60,7 @@ public class ArgumentParser {
 //        }
 
         validate(lex(input)); //will be caught by programmer
+        return namespace;
     }
 
     /**
@@ -81,8 +84,9 @@ public class ArgumentParser {
      * @param tokens List of tokens, as generated from lex.
      */
     private void validate(ArrayList<ArgToken> tokens) throws ValidationException {
-        // TODO: Validate
-        throw new NotImplementedException("Validator not implemented");
-        //throw new ValidationException("TODO: more descriptive error message here");
+
+        var v = new Validator();
+        v.validate(tokens, arguments);
+
     }
 }

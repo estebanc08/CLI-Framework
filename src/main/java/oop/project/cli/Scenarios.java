@@ -51,7 +51,7 @@ public class Scenarios {
 
     //good place to test/showcase your functionality in context.
 
-    static  Map<String, List<Object>> string(String arguments) throws ValidationException {
+    static Map<String, List<Object>> string(String arguments) throws ValidationException {
         ArgumentParser parser = new ArgumentParser("string", "testing functionality of string parsing");
         parser.addArgument(new ArgumentBuilder<>(String.class, "positional")
                 .setPositional(true)
