@@ -16,11 +16,11 @@ public class Argument <T>{
     public final boolean positional; // might not be necessary?
 
     ArrayList<T> value;
-    public Argument(ArgumentBuilder<T> builder) {
+    public Argument(ArgumentBuilder builder) {
         names = builder.names;
         ref = builder.ref;
-        type = builder.type;
-        range = builder.range;
+        type = (Class<T>) builder.type;  // unchecked but probably is ok..?
+        range = (IRange<T>) builder.range;
         nArgs = builder.nArgs;
         helpMessage = builder.helpMessage;
         helpName = builder.helpName;

@@ -1,6 +1,7 @@
 package oop.project.cli.argparser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 
 import static oop.project.cli.argparser.ArgToken.Type.NAMED_ARG;
@@ -8,10 +9,10 @@ import static oop.project.cli.argparser.ArgToken.Type.POSITIONAL_ARG;
 
 public class Validator {
 
-    ArrayList<Argument<Object>> arguments;
+    ArrayList<Argument<?>> arguments;
     HashSet<String> consumedArguments;
 
-    public Validator(ArrayList<Argument<Object>> arguments) {
+    public Validator(ArrayList<Argument<?>> arguments) {
         this.arguments = arguments;
         this.consumedArguments = new HashSet<>();
     }
@@ -34,16 +35,9 @@ public class Validator {
      * @param name Name of the argument to find.
      * @return The argument with the given name, or null if not found.
      */
-    private Argument<Object> findArgument(String name) {
-        for (var argument : arguments) {
-            if (argument.names.contains(name)) {
-                return argument;
-            }
-            for (var currName : argument.names) {
-                if (currName.equals(name)) {
-                    return argument;
-                }
-            }
+    private Argument<?> findArgument(String name) {
+        for (var arg : arguments) {
+            if (Arrays.asList(arg.names).contains(name)) { return arg; }
         }
         return null;
     }

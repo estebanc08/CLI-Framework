@@ -10,13 +10,13 @@ public class ArgumentParser {
     private final String programName;
     public String description;
     private final MappedData namespace = new MappedData();
-    ArrayList<Argument> arguments = new ArrayList<>();
+    ArrayList<Argument<?>> arguments = new ArrayList<>();
 
     public ArgumentParser(String programName, String description) {
         this.programName = programName;
         this.description = description;
         this.namespace.map = new HashMap<>();
-        var helpFlag = new ArgumentBuilder<>(String.class, "help", "-h", "--help")
+        var helpFlag = new ArgumentBuilder(String.class, "help", "-h", "--help")
                 .setPositional(false)
                 .setRequired(false)
                 .setNArgs("0")
@@ -32,12 +32,17 @@ public class ArgumentParser {
      *
      * @param argument Argument to add to the parser.
      */
-    public void addArgument(Argument<Object> argument) {
+    public void addArgument(Argument<?> argument) {
         // If any overlap between this argument's names and other, previously defined arguments, throw error
         var namespaceNames = arguments.stream().flatMap(arg -> Arrays.stream(arg.names)).toList();
-        if (Arrays.stream(argument.names).anyMatch(namespaceNames::contains)) {
-            throw new ParseException()
-        }
+        if (Arrays.stream(argument.names).anyMatch(namespaceNames::contains))
+            { throw new ArgumentException("Name identifier already exists with one of the following names: "+ Arrays.toString(argument.names)); }
+
+        // If any overlap between this argument's refs and other, throw error
+        var namespaceRefs = arguments.stream().map(arg -> arg.ref).toList();
+        if (namespaceRefs.contains(argument.ref))
+            { throw new ArgumentException("Reference already exists: "+ argument.ref); }
+
         arguments.add(argument);
         namespace.map.put(argument.ref, argument);
     }
@@ -48,7 +53,7 @@ public class ArgumentParser {
      * @param ref String referencing an argument in the namespace
      * @return Argument associated with the string, or {@code null} if none exists.
      */
-    public Argument getArgument(String ref) {
+    public Argument<?> getArgument(String ref) {
         return namespace.map.get(ref);
     }
 
@@ -85,8 +90,7 @@ public class ArgumentParser {
      */
     private void validate(ArrayList<ArgToken> tokens) throws ValidationException {
 
-        var v = new Validator();
-        v.validate(tokens, arguments);
-
+        var v = new Validator(arguments);
+        v.validate(tokens);
     }
 }
