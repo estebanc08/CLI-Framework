@@ -44,8 +44,14 @@ public final class Lexer {
             if (currentChar == '\\') { // Handle escape characters
                 if (chars.has(1)) {
                     char nextChar = chars.get(1);
-                    if (nextChar == '"' || nextChar == '\\') {
-                        curr.append(nextChar);
+                    if (nextChar == '"' || nextChar == '\\' || nextChar == 't' || nextChar == 'n') {
+                        if (nextChar == 't') {
+                            curr.append('\t'); // Append tab character
+                        } else if (nextChar == 'n') {
+                            curr.append('\n'); // Append newline character
+                        } else {
+                            curr.append(nextChar);
+                        }
                         chars.advance(2);
                     } else {
                         throw new ParseException("Invalid escape sequence: \\" + nextChar);

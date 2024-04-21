@@ -38,10 +38,22 @@ public class LexerTests {
                     //"string 1 "string2""
                     Arguments.of("Nested double quotes", "\"string1 \\\"string2\\\"\"", new ArrayList<>(List.of(
                             new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", new ArrayList<>(List.of("string1 \"string2\"")))))),
+                    //"string 'with "quotes""
+                    Arguments.of("String with Mixed Quotes", "\"string 'with' \\\"quotes\\\"\"", new ArrayList<>(List.of(
+                            new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", new ArrayList<>(List.of("string 'with' \"quotes\"")))))),
                     Arguments.of("Missing Quotes", "string", null),
                     Arguments.of("Missing first Quote", "string\"", null),
                     Arguments.of("Missing last Quote", "\"string", null),
-                    Arguments.of("Missing last Quote - spaced out", "\"string1 string2", null)
+                    Arguments.of("Missing last Quote - spaced out", "\"string1 string2", null),
+                    Arguments.of("Empty String", "\"\"",
+                            new ArrayList<>(List.of(new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", new ArrayList<>(List.of("")))))),
+                    Arguments.of("String With Whitespace", "\"  string  \t\"",
+                            new ArrayList<>(List.of(new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", new ArrayList<>(List.of("  string  ")))))), //TODO i dont know why its adding a singular random extra whitespace help
+                    Arguments.of("String with Escaped Characters", "\"\\t\\n\"",
+                            new ArrayList<>(List.of(new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", new ArrayList<>(List.of("\t\n"))))))
+
+
+
             );
         }
         @ParameterizedTest
@@ -96,6 +108,23 @@ public class LexerTests {
     @Nested
     class FlagTests{
         //TODO: ADD BASIC TEST CASES FOR FLAGS
+        @ParameterizedTest
+        @MethodSource
+        public void testFlags(String name, String command, ArrayList<ArgToken> expected) {
+            test(command, expected);
+        }
+
+        public static Stream<Arguments> testFlags() {
+            return Stream.of(
+                    Arguments.of("Single Flag", "--flag", new ArrayList<>(List.of(
+                            new ArgToken(ArgToken.Type.FLAG, "flag", new ArrayList<>())))),
+                    Arguments.of("Flag with Value", "--flag=\"value\"", new ArrayList<>(List.of(
+                            new ArgToken(ArgToken.Type.NAMED_ARG, "flag", new ArrayList<>(List.of("value")))))),
+                    Arguments.of("Multiple Flags", "--flag1 --flag2=\"value2\"", new ArrayList<>(List.of(
+                            new ArgToken(ArgToken.Type.FLAG, "flag1", new ArrayList<>()),
+                            new ArgToken(ArgToken.Type.NAMED_ARG, "flag2", new ArrayList<>(List.of("value2"))))))
+            );
+        }
     }
 
     @Nested
