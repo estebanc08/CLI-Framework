@@ -2,6 +2,7 @@ package oop.project.cli.argparser;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Argument <T>{
     public final String[] names;
@@ -25,11 +26,26 @@ public class Argument <T>{
         helpName = builder.helpName;
         required = builder.required;
         positional = builder.positional;
-
         value = new ArrayList<>();
     }
 
     public ArrayList<T> getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return "\nArgument{\n" +
+                "\tnames=" + Arrays.toString(names) + '\n' +
+                "\tref='" + ref + "'\n" +
+                "\ttype=" + type + "\n" +
+                "\trange=" + range + "\n" +
+                "\tnArgs='" + nArgs  + "'\n" +
+                "\thelpMessage='" + helpMessage + "'\n" +
+                "\thelpName='" + helpName  +"'\n" +
+                "\trequired=" + required + "\n" +
+                "\tpositional=" + positional + "\n" +
+                "}\n";
+    }
+
 }

@@ -131,7 +131,6 @@ public class Scenarios {
                 .setNArgs("?")
                 .setHelpMessage("Pass in strings to validate if ? operation correct")
                 .build());
-
         parser.parse(arguments); //if fails, will throw validateException
         List<Object> res = new ArrayList<Object>(parser.getArgument("positional").getValue());
         return Map.of("flag", res);

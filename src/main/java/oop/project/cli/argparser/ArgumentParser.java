@@ -7,7 +7,7 @@ public class ArgumentParser {
     private final String programName;
     public String description;
     private final MappedData namespace = new MappedData();
-    ArrayList<Argument> arguments;
+    ArrayList<Argument> arguments = new ArrayList<>();
 
     public ArgumentParser(String programName, String description) {
         this.programName = programName;
@@ -22,7 +22,6 @@ public class ArgumentParser {
      * @param argument Argument to add to the parser.
      */
     public void addArgument(Argument argument) {
-        // TODO: Add some logic for duplicate refs, maybe throw an error?
         arguments.add(argument);
         namespace.map.put(argument.ref, argument);
     }
@@ -58,23 +57,8 @@ public class ArgumentParser {
 //        } catch (ValidationException err) {
 //            // TODO: Do something with it, tell the user somehow
 //        }
-
-        validate(lex(input)); //will be caught by programmer
+        validate(new Lexer(input).lex()); //will be caught by programmer
         return namespace;
-    }
-
-    /**
-     * Lexing of the raw input into an array of tokens.
-     *
-     * @param rawArguments Raw arguments - that is, whatever the user input.
-     * @return List of tokens, each with values, kinds, and potentially names (if non-positional: empty string if unnamed)
-     */
-    private ArrayList<ArgToken> lex(String rawArguments) {
-        // TODO: Lex
-        var lexer = new Lexer(rawArguments);
-        var res = lexer.lex();
-        System.out.println(res);
-        return res;
     }
 
 

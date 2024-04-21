@@ -47,6 +47,7 @@ public class Validator {
      * @throws ValidationException if validation fails.
      */
     private static void validateToken(ArgToken token, Argument argument) throws ValidationException {
+        System.out.println(token + " " +  argument);
         // Perform validation based on the type of argument
         if(argument.positional){
             validatePositionalArgument(token, argument);

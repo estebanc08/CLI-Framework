@@ -1,6 +1,7 @@
 package oop.project.cli.argparser;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
 
 public class ArgumentBuilder<T> {
     protected String[] names;
