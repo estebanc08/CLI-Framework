@@ -140,8 +140,12 @@ public class LexerTests {
             return Stream.of(
                     Arguments.of("Single Named Argument", "--name=\"value\"", new ArrayList<>(List.of(
                             new ArgToken(ArgToken.Type.NAMED_ARG, "--name", new ArrayList<>(List.of("value")))))),
-                    Arguments.of("Multiple Named Arguments", "--name1=\"value1\" --name2=2", new ArrayList<>(List.of(
-                            new ArgToken(ArgToken.Type.NAMED_ARG, "--name1", new ArrayList<>(List.of("value1"))),
+                    Arguments.of("Single Named Argument No --", "name=1", new ArrayList<>(List.of(
+                            new ArgToken(ArgToken.Type.NAMED_ARG, "name", new ArrayList<>(List.of(new BigInteger("1"))))))),
+                    Arguments.of("Single Named Argument No -- indicator", "name=\"value\"", new ArrayList<>(List.of(
+                            new ArgToken(ArgToken.Type.NAMED_ARG, "name", new ArrayList<>(List.of("value")))))),
+                    Arguments.of("Multiple Named Arguments", "name1=\"value1\" --name2=2", new ArrayList<>(List.of(
+                            new ArgToken(ArgToken.Type.NAMED_ARG, "name1", new ArrayList<>(List.of("value1"))),
                             new ArgToken(ArgToken.Type.NAMED_ARG, "--name2", new ArrayList<>(List.of(new BigInteger("2"))))))),
                     Arguments.of("Invalid Named Argument", "--=value", null),
                     Arguments.of("Named Argument with Array Value", "--name3=[1 2 3 4]", new ArrayList<>(List.of(
