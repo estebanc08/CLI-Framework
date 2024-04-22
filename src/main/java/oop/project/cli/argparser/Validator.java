@@ -96,4 +96,5 @@ public class Validator {
     private static void validateFlag(ArgToken token, Argument argument) throws ValidationException {
         throw new NotImplementedException("validate flag not done");
     }
+
 }

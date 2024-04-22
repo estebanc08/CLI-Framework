@@ -20,7 +20,7 @@ public class ArgumentParser {
                 .setPositional(false)
                 .setRequired(false)
                 .setNArgs("0")
-                .setHelpMessage("temp help")
+                .setHelpMessage("Help")
                 .build();
         addArgument(helpFlag);
         this.namespace.map.put(helpFlag.ref, helpFlag);
@@ -78,7 +78,7 @@ public class ArgumentParser {
 //        } catch (ValidationException err) {
 //            // TODO: Do something with it, tell the user somehow
 //        }
-        validate(new Lexer(input).lex()); //will be caught by programmer
+        validate(new Lexer(input).lex(), namespace); //will be caught by programmer
         return namespace;
     }
 
@@ -88,9 +88,43 @@ public class ArgumentParser {
      *  number of args, etc. Throws a validation error if something is awry.
      * @param tokens List of tokens, as generated from lex.
      */
-    private void validate(ArrayList<ArgToken> tokens) throws ValidationException {
-
+    private void validate(ArrayList<ArgToken> tokens, MappedData data) throws ValidationException {
         var v = new Validator(arguments);
         v.validate(tokens);
+    }
+
+    public void invokeHelp() {
+        System.out.print("Usage: " );
+        StringBuilder positionals = new StringBuilder();
+        int optional = 0;
+        for(var entry : namespace.map.entrySet()){
+            var value = entry.getValue();
+            if(value.positional){
+                var name = value.helpName == null ? value.ref : value.helpName;
+                positionals.append("[").append(name).append(": ").append(value.type.getSimpleName()).append("] ");
+            }else{
+                if(!value.required){
+                    optional++;
+                    continue;
+                }
+                var name = value.helpName == null ? value.names[0] : value.helpName;
+                System.out.print("<" + name +": "+value.type.getSimpleName()+ "> ");
+            }
+        }
+        if(optional > 0) System.out.print("< options > ");
+        System.out.println(positionals + "\nOptions:");
+
+        for(var entry : namespace.map.entrySet()) {
+            var value = entry.getValue();
+            if(!value.positional && !value.ref.equals("help")){
+                for (int i = 0; i < value.names.length; i++) {
+                    System.out.print(value.names[i]);
+                    if (i < value.names.length - 1) System.out.print(", ");
+                }
+                if(value.helpMessage != null)
+                    System.out.print("\t\t" + value.helpMessage);
+                System.out.println();
+            }
+        }
     }
 }

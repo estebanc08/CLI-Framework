@@ -146,7 +146,11 @@ public class Scenarios {
                 .setHelpMessage("Pass in strings to validate if + operation correct")
                 .build());
 
-        parser.parse(arguments); //if fails, will throw validateException
+        try {parser.parse(arguments);} //if fails, will throw validateException
+        catch (ValidationException e) {
+            System.out.println(e.toString());
+            parser.invokeHelp();
+        }
         List<Object> res = new ArrayList<Object>(parser.getArgument("flag").getValue());
         return Map.of("flag", res);
     }
@@ -314,6 +318,7 @@ public class Scenarios {
                 .setPositional(true)
                 .setRequired(true)
                 .setNArgs("?")
+                .setHelpName("HELP NAME")
                 .setHelpMessage("required dest positional")
                 .build());
 

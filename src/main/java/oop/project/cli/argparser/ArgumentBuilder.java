@@ -101,7 +101,7 @@ public class ArgumentBuilder<T extends Comparable<T>> {
         return this;
     }
     public ArgumentBuilder<T> setPositional(boolean positional) {
-        this.positional = true;
+        this.positional = positional;
         return this;
     }
     public Argument<T> build() {
