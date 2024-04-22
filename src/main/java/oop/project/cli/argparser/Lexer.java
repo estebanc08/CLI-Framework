@@ -1,37 +1,44 @@
 package oop.project.cli.argparser;
-
-import com.google.common.io.CharStreams;
-
-import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
 
 public final class Lexer {
 
     private final CharStream chars;
+    String input;
     public Lexer(String input) {
         chars = new CharStream(input);
+        this.input = input;
+    }
+
+    private int getSizeOfName(){
+        String[] parts = input.split("=", 2);
+        String key = parts[0];
+        return key.length() - 1;
     }
 
 
     public ArrayList<ArgToken> lex() {
         var tokens = new ArrayList<ArgToken>();
         while(chars.hasNext()){
-            while (chars.hasNext() && match("[ ]")) {} //git rid of whitespace between words
-            if(peek("[\\.0-9\"\\[]") || peek("[\\-]", "[\\.0-9]")){
+            while (chars.hasNext() && match("[ ]")) {} // get rid of whitespace between words
+             if (peek(0,"\"") || peek(0,"[\\.0-9\\[]") || peek(0,"[\\-]", "[\\.0-9]")) {
                 tokens.add(new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", lexPositional()));
-            }else if(peek("\\-" , "[a-zA-Z]") || peek("[\\-]", "[\\-]", "[a-zA-Z]")){
+            } else if ((peek(getSizeOfName(),"[a-zA-Z0-9]", "=") && !peek(0, "[0-9]")) || peek(0,"\\-", "[a-zA-Z]") || peek(0,"[\\-]", "[\\-]", "[a-zA-Z]")) {
                 tokens.addAll(lexNamed());
-            }else{
-                throw new ParseException("Not a valid positional value, named argument, or flag");
+            } else {
+                throw new ParseException("Not a valid positional value, named argument, or flag. Input: " + input + " " + getSizeOfName());
             }
-            if(chars.hasNext() && !peek("[ ]"))
-                throw new ParseException("Required space between flags or positional values");
+            if(chars.hasNext() && !peek(0,"[ ]"))
+                throw new ParseException("Required space between flags or positional values. Input: " + input);
         }
         return tokens;
     }
+
+
+
 
     private String lexString() {
         StringBuilder curr = new StringBuilder();
@@ -68,7 +75,7 @@ public final class Lexer {
                 chars.advance(1);
             }
         }
-        if (peek("\"")) {
+        if (peek(0,"\"")) {
             chars.advance(1);
         } else {
             throw new ParseException("Missing closing quotation mark");
@@ -81,11 +88,11 @@ public final class Lexer {
 
     private Object lexNumber(){ //will store all numbers as decimals and later check if expecting int that number is valid int
         StringBuilder curr = new StringBuilder();
-        if (peek("-", "[0-9]") || peek("-", "\\.", "[0-9]")) {
+        if (peek(0,"-", "[0-9]") || peek(0,"-", "\\.", "[0-9]")) {
             curr.append(chars.getNext());
             chars.advance(1);
         }
-        while(chars.hasNext() && peek("[0-9\\.]")){
+        while(chars.hasNext() && peek(0,"[0-9\\.]")){
             curr.append(chars.getNext());
             chars.advance(1);
         }
@@ -101,9 +108,9 @@ public final class Lexer {
 
     private Object lexObject(){
         //TODO: Need to differentiate between dates and negative values. Should dates be passed as strings and then type coerced later?
-        if (peek("\"")) { // Check if string
+        if (peek(0,"\"")) { // Check if string
             return lexString();
-        } else if(peek("[0-9-\\.]")){
+        } else if(peek(0,"[0-9-\\.]")){
             return lexNumber();
         }else{
             throw new ParseException("Unsupported type or invalid input for value");
@@ -114,7 +121,7 @@ public final class Lexer {
         ArrayList<Object> list = new ArrayList<>();
         match("[\\[]");
         while(match("[ ]")) {}; //want to ignore whitespace
-        while (!peek("[\\]]")) {
+        while (!peek(0,"[\\]]")) {
             list.add(lexObject());
             while(match("[ ]")) {};
         }
@@ -123,7 +130,7 @@ public final class Lexer {
     }
     private ArrayList<Object> lexPositional() {
         ArrayList<Object> vals = new ArrayList<>();
-        if (peek("[\\[]")) { // lexing positional multiple values
+        if (peek(0,"[\\[]")) { // lexing positional multiple values
             vals.addAll(lexList());
         }else{ // lexing string or number
             vals.add(lexObject());
@@ -137,37 +144,46 @@ public final class Lexer {
         ArrayList<ArgToken> tokens = new ArrayList<>();
         ArrayList<Object> vals = new ArrayList<>();
         StringBuilder name = new StringBuilder();
-        if(peek("[\\-]", "[\\-]", "[a-zA-Z]")){ // --flag
+        if(peek(0,"[\\-]", "[\\-]", "[a-zA-Z]")){ // --flag
             chars.advance(2);
             name.append("--");
-            while(chars.has(0) && peek("[a-zA-Z0-9_]")){
+            while(chars.hasNext() && peek(0,"[a-zA-Z0-9_]")){
                 name.append(chars.getNext());
                 chars.advance(1);
             }
             if (match("=")){
                 vals.addAll(lexPositional());
                 tokens.add(new ArgToken(ArgToken.Type.NAMED_ARG, name.toString(), vals));
-                return tokens;
             }
             else {
                 tokens.add(new ArgToken(ArgToken.Type.FLAG, name.toString(), vals));
-                return tokens;
-            }
-        }else { //flag with one -
-            chars.advance(1);
-            while(chars.hasNext() && peek("[a-zA-Z]")) {
-                tokens.add(new ArgToken(ArgToken.Type.FLAG, "-" + chars.getNext(), vals));
-                chars.advance(1);
             }
             return tokens;
+        }else if(peek(0, "[\\-]", "[a-zA-Z]")) { //flag with one -
+            chars.advance(1);
+            while (chars.hasNext() && peek(0, "[a-zA-Z]")) {
+                tokens.add(new ArgToken(ArgToken.Type.FLAG, "-" + chars.get(0), vals));
+                chars.advance(1);
+            }
         }
+        else {
+            while (chars.has(0) && peek(0, "[a-zA-Z0-9_]")) {
+                name.append(chars.get(0));
+                chars.advance(1);
+            }
+            if (match("=")) {
+                vals.addAll(lexPositional());
+                tokens.add(new ArgToken(ArgToken.Type.NAMED_ARG, name.toString(), vals));
+                return tokens;
+            }
+        }
+            return tokens;
     };
 
     /** Given a list of regexes / characters, will peek forward that list's length and test each character against each regex.**/
-    private boolean peek(Object... objects) {
-        if (!chars.has(objects.length - 1)) { return false; }
+    private boolean peek(int offset, Object... objects) {
         for (var i = 0; i < objects.length; i++) {
-            if (!test(objects[i], chars.get(i))) {
+            if (!chars.has(offset + i) || !test(objects[i], chars.get(offset + i))) {
                 return false;
             }
         }
@@ -175,7 +191,7 @@ public final class Lexer {
     }
 
     private boolean match(Object... objects) {
-        var peek = peek(objects);
+        var peek = peek(0, objects);
         if (peek) {
             chars.advance(objects.length);
         }
