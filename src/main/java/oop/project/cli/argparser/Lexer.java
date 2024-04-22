@@ -26,10 +26,10 @@ public final class Lexer {
             while (chars.has(0) && match("[ ]")) {} // get rid of whitespace between words
              if (peek(0,"\"") || peek(0,"[\\.0-9\\[]") || peek(0,"[\\-]", "[\\.0-9]")) {
                 tokens.add(new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", lexPositional()));
-            } else if (peek(getSizeOfName(),"[a-zA-Z]+", "=") || peek(0,"\\-", "[a-zA-Z]") || peek(0,"[\\-]", "[\\-]", "[a-zA-Z]")) {
+            } else if ((peek(getSizeOfName(),"[a-zA-Z0-9]", "=") && !peek(0, "[0-9]")) || peek(0,"\\-", "[a-zA-Z]") || peek(0,"[\\-]", "[\\-]", "[a-zA-Z]")) {
                 tokens.addAll(lexNamed());
             } else {
-                throw new ParseException("Not a valid positional value, named argument, or flag. Input: " + input);
+                throw new ParseException("Not a valid positional value, named argument, or flag. Input: " + input + " " + getSizeOfName());
             }
             if(chars.has(0) && !peek(0,"[ ]"))
                 throw new ParseException("Required space between flags or positional values. Input: " + input);
@@ -154,11 +154,10 @@ public final class Lexer {
             if(match("=")){
                 vals.addAll(lexPositional());
                 tokens.add(new ArgToken(ArgToken.Type.NAMED_ARG, name.toString(), vals));
-                return tokens;
             }else{
                 tokens.add(new ArgToken(ArgToken.Type.FLAG, name.toString(), vals));
-                return tokens;
             }
+            return tokens;
         }else if(peek(0, "[\\-]", "[a-zA-Z]")) { //flag with one -
             chars.advance(1);
             while (chars.has(0) && peek(0, "[a-zA-Z]")) {
