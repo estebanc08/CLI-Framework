@@ -18,8 +18,8 @@ public final class Lexer {
 
     public ArrayList<ArgToken> lex() {
         var tokens = new ArrayList<ArgToken>();
-        while(chars.has(0)){
-            while (chars.has(0) && match("[ ]")) {} //git rid of whitespace between words
+        while(chars.hasNext()){
+            while (chars.hasNext() && match("[ ]")) {} //git rid of whitespace between words
             if(peek("[\\.0-9\"\\[]") || peek("[\\-]", "[\\.0-9]")){
                 tokens.add(new ArgToken(ArgToken.Type.POSITIONAL_ARG, "positional", lexPositional()));
             }else if(peek("\\-" , "[a-zA-Z]") || peek("[\\-]", "[\\-]", "[a-zA-Z]")){
@@ -27,7 +27,7 @@ public final class Lexer {
             }else{
                 throw new ParseException("Not a valid positional value, named argument, or flag");
             }
-            if(chars.has(0) && !peek("[ ]"))
+            if(chars.hasNext() && !peek("[ ]"))
                 throw new ParseException("Required space between flags or positional values");
         }
         return tokens;
@@ -36,8 +36,8 @@ public final class Lexer {
     private String lexString() {
         StringBuilder curr = new StringBuilder();
         match("\"");
-        while (chars.has(0)) {
-            char currentChar = chars.get(0);
+        while (chars.hasNext()) {
+            char currentChar = chars.getNext();
             if (currentChar == '\\') { // Handle escape characters
                 if (chars.has(1)) {
                     char nextChar = chars.get(1);
@@ -82,11 +82,11 @@ public final class Lexer {
     private Object lexNumber(){ //will store all numbers as decimals and later check if expecting int that number is valid int
         StringBuilder curr = new StringBuilder();
         if (peek("-", "[0-9]") || peek("-", "\\.", "[0-9]")) {
-            curr.append(chars.get(0));
+            curr.append(chars.getNext());
             chars.advance(1);
         }
-        while(chars.has(0) && peek("[0-9\\.]")){
-            curr.append(chars.get(0));
+        while(chars.hasNext() && peek("[0-9\\.]")){
+            curr.append(chars.getNext());
             chars.advance(1);
         }
         try{
@@ -134,37 +134,40 @@ public final class Lexer {
     };
 
     private ArrayList<ArgToken> lexNamed(){
-        ArrayList<ArgToken> tokens = new ArrayList<ArgToken>();
+        ArrayList<ArgToken> tokens = new ArrayList<>();
         ArrayList<Object> vals = new ArrayList<>();
         StringBuilder name = new StringBuilder();
         if(peek("[\\-]", "[\\-]", "[a-zA-Z]")){ // --flag
             chars.advance(2);
             name.append("--");
             while(chars.has(0) && peek("[a-zA-Z0-9_]")){
-                name.append(chars.get(0));
+                name.append(chars.getNext());
                 chars.advance(1);
             }
-            if(match("=")){
+            if (match("=")){
                 vals.addAll(lexPositional());
                 tokens.add(new ArgToken(ArgToken.Type.NAMED_ARG, name.toString(), vals));
                 return tokens;
-            }else{
+            }
+            else {
                 tokens.add(new ArgToken(ArgToken.Type.FLAG, name.toString(), vals));
                 return tokens;
             }
         }else { //flag with one -
             chars.advance(1);
-            while(chars.has(0) && peek("[a-zA-Z]")) {
-                tokens.add(new ArgToken(ArgToken.Type.FLAG, "-" + chars.get(0), vals));
+            while(chars.hasNext() && peek("[a-zA-Z]")) {
+                tokens.add(new ArgToken(ArgToken.Type.FLAG, "-" + chars.getNext(), vals));
                 chars.advance(1);
             }
             return tokens;
         }
     };
 
+    /** Given a list of regexes / characters, will peek forward that list's length and test each character against each regex.**/
     private boolean peek(Object... objects) {
+        if (!chars.has(objects.length - 1)) { return false; }
         for (var i = 0; i < objects.length; i++) {
-            if (!chars.has(i)  || !test(objects[i], chars.get(i))) {
+            if (!test(objects[i], chars.get(i))) {
                 return false;
             }
         }
@@ -200,15 +203,27 @@ public final class Lexer {
         }
 
 
+        /** See if the current input string has <code>offset</code> more characters left to lex */
         public boolean has(int offset) {
             return index + length + offset < input.length();
         }
 
+        /** For readability's sake: just calls <code>has(0)</code> */
+        private boolean hasNext() {
+            return has(0);
+        }
+
+        /** Retrieves the character of our current position plus <code>offset</code> */
         public char get(int offset) {
             if (!has(offset)) {
                 throw new IllegalArgumentException("Broken lexer invariant.");
             }
             return input.charAt(index + length + offset);
+        }
+
+        /** For readability's sake: just calls <code>get(0)</code> */
+        private char getNext() {
+            return get(0);
         }
 
         public void advance(int chars) {

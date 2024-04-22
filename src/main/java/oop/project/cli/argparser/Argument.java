@@ -4,7 +4,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Argument <T>{
+public class Argument <T extends Comparable<T>>{
     public final String[] names;
     public final String ref;
     public final Class<T> type;
@@ -13,9 +13,9 @@ public class Argument <T>{
     public final String helpMessage;
     public final String helpName;
     public final boolean required;
-    public final boolean positional; // might not be necessary?
+    public final boolean positional;
+    public ArrayList<Object> value;
 
-    ArrayList<T> value;
     public Argument(ArgumentBuilder<T> builder) {
         names = builder.names;
         ref = builder.ref;
@@ -29,7 +29,7 @@ public class Argument <T>{
         value = new ArrayList<>();
     }
 
-    public ArrayList<T> getValue() {
+    public ArrayList<Object> getValue() {
         return value;
     }
 

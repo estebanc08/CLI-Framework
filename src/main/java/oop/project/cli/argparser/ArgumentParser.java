@@ -1,13 +1,16 @@
 package oop.project.cli.argparser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ArgumentParser {
     private final String programName;
     public String description;
     private final MappedData namespace = new MappedData();
-    ArrayList<Argument> arguments = new ArrayList<>();
+    ArrayList<Argument<?>> arguments = new ArrayList<>();
 
     public ArgumentParser(String programName, String description) {
         this.programName = programName;
@@ -29,7 +32,17 @@ public class ArgumentParser {
      *
      * @param argument Argument to add to the parser.
      */
-    public void addArgument(Argument argument) {
+    public void addArgument(Argument<?> argument) {
+        // If any overlap between this argument's names and other, previously defined arguments, throw error
+        var namespaceNames = arguments.stream().flatMap(arg -> Arrays.stream(arg.names)).toList();
+        if (Arrays.stream(argument.names).anyMatch(namespaceNames::contains))
+            { throw new ArgumentException("Name identifier already exists with one of the following names: "+ Arrays.toString(argument.names)); }
+
+        // If any overlap between this argument's refs and other, throw error
+        var namespaceRefs = arguments.stream().map(arg -> arg.ref).toList();
+        if (namespaceRefs.contains(argument.ref))
+            { throw new ArgumentException("Reference already exists: "+ argument.ref); }
+
         arguments.add(argument);
         namespace.map.put(argument.ref, argument);
     }
@@ -40,7 +53,7 @@ public class ArgumentParser {
      * @param ref String referencing an argument in the namespace
      * @return Argument associated with the string, or {@code null} if none exists.
      */
-    public Argument getArgument(String ref) {
+    public Argument<?> getArgument(String ref) {
         return namespace.map.get(ref);
     }
 
@@ -76,9 +89,42 @@ public class ArgumentParser {
      * @param tokens List of tokens, as generated from lex.
      */
     private void validate(ArrayList<ArgToken> tokens, MappedData data) throws ValidationException {
+        var v = new Validator(arguments);
+        v.validate(tokens);
+    }
 
-        var v = new Validator();
-        v.validate(tokens, arguments, data);
+    public void invokeHelp() {
+        System.out.print("Usage: " );
+        StringBuilder positionals = new StringBuilder();
+        int optional = 0;
+        for(var entry : namespace.map.entrySet()){
+            var value = entry.getValue();
+            if(value.positional){
+                var name = value.helpName == null ? value.ref : value.helpName;
+                positionals.append("[").append(name).append(": ").append(value.type.getSimpleName()).append("] ");
+            }else{
+                if(!value.required){
+                    optional++;
+                    continue;
+                }
+                var name = value.helpName == null ? value.names[0] : value.helpName;
+                System.out.print("<" + name +": "+value.type.getSimpleName()+ "> ");
+            }
+        }
+        if(optional > 0) System.out.print("< options > ");
+        System.out.println(positionals + "\nOptions:");
 
+        for(var entry : namespace.map.entrySet()) {
+            var value = entry.getValue();
+            if(!value.positional && !value.ref.equals("help")){
+                for (int i = 0; i < value.names.length; i++) {
+                    System.out.print(value.names[i]);
+                    if (i < value.names.length - 1) System.out.print(", ");
+                }
+                if(value.helpMessage != null)
+                    System.out.print("\t\t" + value.helpMessage);
+                System.out.println();
+            }
+        }
     }
 }

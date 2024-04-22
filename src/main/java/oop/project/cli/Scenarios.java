@@ -139,15 +139,19 @@ public class Scenarios {
 
     static Map<String, List<Object>> flagNArgsPlus(String arguments) throws ValidationException {
         ArgumentParser parser = new ArgumentParser("flagNArgsPlus", "testing functionality of flag with + args");
-        parser.addArgument(new ArgumentBuilder<>(String.class, "flag", "-f", "--flag")
+        parser.addArgument(new ArgumentBuilder<>(BigInteger.class, "flag", "-f", "--flag")
                 .setPositional(false)
                 .setRequired(true)
                 .setNArgs("+")
                 .setHelpMessage("Pass in strings to validate if + operation correct")
                 .build());
 
-        parser.parse(arguments); //if fails, will throw validateException
-        List<Object> res = new ArrayList<Object>(parser.getArgument("positional").getValue());
+        try {parser.parse(arguments);} //if fails, will throw validateException
+        catch (ValidationException e) {
+            System.out.println(e.toString());
+            parser.invokeHelp();
+        }
+        List<Object> res = new ArrayList<Object>(parser.getArgument("flag").getValue());
         return Map.of("flag", res);
     }
 
