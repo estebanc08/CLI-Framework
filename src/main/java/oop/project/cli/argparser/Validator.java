@@ -1,10 +1,7 @@
 package oop.project.cli.argparser;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 
 import static oop.project.cli.argparser.ArgToken.Type.NAMED_ARG;
@@ -27,8 +24,14 @@ public class Validator {
      * @throws ValidationException if validation fails.
      */
     public void validate(ArrayList<ArgToken> tokens) throws ValidationException {
+        // Validate all tokens
+        for (ArgToken token : tokens) { validateToken(token); }
+
+        // Once tokens are validated, we can start assigning our arguments values
         for (ArgToken token : tokens) {
-            validateToken(token);
+            var argument = findArgument(token.name());
+            assert(argument != null);  // Likely would never happen but just to appease the compiler
+            argument.value = token.value();
         }
     }
 
@@ -71,17 +74,21 @@ public class Validator {
         var argument = findArgument(name);
         if (argument == null) { throw new ValidationException("No such argument " + name + " found."); }
 
+
+        // Type validation
+        var type = argument.type;
+        if (!token.value().getFirst().getClass().equals(argument.type))
+            { throw new ValidationException("Got type " + token.value().getFirst().getClass() + ", expected " + argument.type.toString()); }
+
         // Validate its range
-        try { validateObject(argument); }
-        catch (Exception e) { throw new ValidationException("Unexpected type " + argument.type.toString()); }
+        validateObjectRange(argument);
 
         consumedArguments.add(name);
-        throw new NotImplementedException("validate named not done");
     }
 
-    private <U extends Comparable<U>> void validateObject(Argument<U> argument) throws ValidationException {
+    private <U extends Comparable<U>> void validateObjectRange(Argument<U> argument) throws ValidationException {
         for (var val : argument.value) {
-            if (!argument.range.isInRange(val))
+            if (!argument.range.isInRange((U) val))
             { throw new ValidationException(val + " is not in range" + argument.range.toString()); }
         }
     }

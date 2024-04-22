@@ -14,7 +14,7 @@ public class Argument <T extends Comparable<T>>{
     public final String helpName;
     public final boolean required;
     public final boolean positional;
-    public ArrayList<T> value;
+    public ArrayList<Object> value;
 
     public Argument(ArgumentBuilder<T> builder) {
         names = builder.names;
@@ -29,7 +29,7 @@ public class Argument <T extends Comparable<T>>{
         value = new ArrayList<>();
     }
 
-    public ArrayList<T> getValue() {
+    public ArrayList<Object> getValue() {
         return value;
     }
 

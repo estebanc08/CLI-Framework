@@ -16,7 +16,7 @@ public class ArgumentBuilder<T extends Comparable<T>> {
     protected boolean required;
     protected boolean positional;
 
-    private final String identifierPattern = "[a-zA-Z_][a-zA-Z0-9_-]*";
+    private final String identifierPattern = "[a-zA-Z_-][a-zA-Z0-9_-]*";
 
     /**
      * Validates a string to ensure that it conforms with the regex pattern we've chosen
