@@ -20,7 +20,7 @@ public final class Lexer {
     }
 
 
-    public ArrayList<ArgToken> lex() {
+    public ArrayList<ArgToken> lex() throws ArgParseException {
         var tokens = new ArrayList<ArgToken>();
         while(chars.hasNext()){
             while (chars.hasNext() && match("[ ]")) {} // get rid of whitespace between words
@@ -29,10 +29,10 @@ public final class Lexer {
             } else if ((peek(getSizeOfName(),"[a-zA-Z0-9]", "=") && !peek(0, "[0-9]")) || peek(0,"\\-", "[a-zA-Z]") || peek(0,"[\\-]", "[\\-]", "[a-zA-Z]")) {
                 tokens.addAll(lexNamed());
             } else {
-                throw new ParseException("Not a valid positional value, named argument, or flag. Input: " + input + " " + getSizeOfName());
+                throw new ArgParseException("Not a valid positional value, named argument, or flag. Input: " + input + " " + getSizeOfName());
             }
             if(chars.hasNext() && !peek(0,"[ ]"))
-                throw new ParseException("Required space between flags or positional values. Input: " + input);
+                throw new ArgParseException("Required space between flags or positional values. Input: " + input);
         }
         return tokens;
     }
@@ -40,7 +40,7 @@ public final class Lexer {
 
 
 
-    private String lexString() {
+    private String lexString() throws ArgParseException {
         StringBuilder curr = new StringBuilder();
         match("\"");
         while (chars.hasNext()) {
@@ -58,10 +58,10 @@ public final class Lexer {
                         }
                         chars.advance(2);
                     } else {
-                        throw new ParseException("Invalid escape sequence: \\" + nextChar);
+                        throw new ArgParseException("Invalid escape sequence: \\" + nextChar);
                     }
                 } else {
-                    throw new ParseException("Invalid escape character at end of input");
+                    throw new ArgParseException("Invalid escape character at end of input");
                 }
             } else if (currentChar == '"') { // Handle nested quotes
                 if (chars.has(1) && chars.get(1) == '"') {
@@ -78,7 +78,7 @@ public final class Lexer {
         if (peek(0,"\"")) {
             chars.advance(1);
         } else {
-            throw new ParseException("Missing closing quotation mark");
+            throw new ArgParseException("Missing closing quotation mark");
         }
         return curr.toString();
     }
@@ -86,7 +86,7 @@ public final class Lexer {
 
 
 
-    private Object lexNumber(){ //will store all numbers as decimals and later check if expecting int that number is valid int
+    private Object lexNumber() throws ArgParseException { //will store all numbers as decimals and later check if expecting int that number is valid int
         StringBuilder curr = new StringBuilder();
         if (peek(0,"-", "[0-9]") || peek(0,"-", "\\.", "[0-9]")) {
             curr.append(chars.getNext());
@@ -102,11 +102,11 @@ public final class Lexer {
                 return res.toBigInteger();
             else return res;
         }catch(Exception e){
-            throw new ParseException("Invalid number value");
+            throw new ArgParseException("Invalid number value");
         }
     }
 
-    private Object lexObject(){
+    private Object lexObject() throws ArgParseException {
         //TODO: Need to differentiate between dates and negative values. Should dates be passed as strings and then type coerced later?
         if (peek(0,"\"")) { // Check if string
             return lexString();
@@ -117,7 +117,7 @@ public final class Lexer {
         }
     }
 
-    private ArrayList<Object> lexList(){
+    private ArrayList<Object> lexList() throws ArgParseException {
         ArrayList<Object> list = new ArrayList<>();
         match("[\\[]");
         while(match("[ ]")) {}; //want to ignore whitespace
@@ -128,7 +128,7 @@ public final class Lexer {
         match("[\\]]");
         return list;
     }
-    private ArrayList<Object> lexPositional() {
+    private ArrayList<Object> lexPositional() throws ArgParseException {
         ArrayList<Object> vals = new ArrayList<>();
         if (peek(0,"[\\[]")) { // lexing positional multiple values
             vals.addAll(lexList());
@@ -140,7 +140,7 @@ public final class Lexer {
         / By return vals instead of argtoken, can reuse structure for lexNamed that does --flag=[], --flag=1 or --flag="word"*/
     };
 
-    private ArrayList<ArgToken> lexNamed(){
+    private ArrayList<ArgToken> lexNamed() throws ArgParseException {
         ArrayList<ArgToken> tokens = new ArrayList<>();
         ArrayList<Object> vals = new ArrayList<>();
         StringBuilder name = new StringBuilder();

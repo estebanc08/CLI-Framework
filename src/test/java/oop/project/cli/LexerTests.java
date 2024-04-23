@@ -164,6 +164,8 @@ public class LexerTests {
                 Assertions.assertEquals(expected, new Lexer(command).lex());
             } catch (ParseException e) {
                 Assertions.fail(e.getMessage());
+            } catch (ArgParseException e) {
+                throw new RuntimeException(e);
             }
         } else {
             Assertions.assertThrows(ParseException.class, () -> {

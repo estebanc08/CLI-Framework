@@ -1,6 +1,6 @@
 package oop.project.cli;
 
-import oop.project.cli.argparser.ValidationException;
+import oop.project.cli.argparser.ArgParseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -9,11 +9,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.text.DateFormat;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Stream;
-import java.util.Date;
 
 public class ScenariosTests {
     @Nested
@@ -445,7 +443,7 @@ public class ScenariosTests {
         } else {
             //TODO: Update with your specific Exception class or whatever other
             //error handling model you use to check for specific library issues.
-            Assertions.assertThrows(ValidationException.class, () -> {
+            Assertions.assertThrows(ArgParseException.class, () -> {
                 Scenarios.parse(command);
             });
         }

@@ -3,8 +3,6 @@ package oop.project.cli.argparser;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class ArgumentParser {
     private final String programName;
@@ -71,7 +69,7 @@ public class ArgumentParser {
     //          - How do we get input? Do we modify this method signature to take a string, or do we
     //              actually wait for IO in this method? I think waiting for IO makes the most sense, but
     //              we would have to properly document that so it doesn't surprise the user.
-    public MappedData parse(String input) throws ValidationException{
+    public MappedData parse(String input) throws ArgParseException {
         // TODO: Full end-to-end parsing, calling lex and validate
 //        try {
 //            validate(lex(input));
@@ -88,7 +86,7 @@ public class ArgumentParser {
      *  number of args, etc. Throws a validation error if something is awry.
      * @param tokens List of tokens, as generated from lex.
      */
-    private void validate(ArrayList<ArgToken> tokens, MappedData data) throws ValidationException {
+    private void validate(ArrayList<ArgToken> tokens, MappedData data) throws ArgParseException {
         var v = new Validator(arguments);
         v.validate(tokens);
     }
