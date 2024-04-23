@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import static oop.project.cli.argparser.ArgToken.Type.NAMED_ARG;
-import static oop.project.cli.argparser.ArgToken.Type.POSITIONAL_ARG;
+import static oop.project.cli.argparser.ArgToken.Type.*;
 
 public class Validator {
 
@@ -58,6 +57,7 @@ public class Validator {
         // Perform validation based on the type of argument
         if (token.type() == POSITIONAL_ARG) { validatePositionalArgument(token); }
         else if (token.type() == NAMED_ARG) { validateNamedArgument(token); }
+        else if(token.type() == FLAG) { validateFlag(token);}
         else { throw new NotImplementedException("Token of type " + token.type() + " has not been implemented yet."); }
     }
 
@@ -76,9 +76,17 @@ public class Validator {
 
 
         // Type validation
-        var type = argument.type;
-        if (!token.value().getFirst().getClass().equals(argument.type))
+        for(var val : token.value()){
+            if(!val.getClass().equals(argument.type))
             { throw new ValidationException("Got type " + token.value().getFirst().getClass() + ", expected " + argument.type.toString()); }
+        }
+
+        if(argument.nArgs.equals("?") && token.value().size() >= 2){
+            throw new ValidationException("Too many arguments");
+        }
+        if(argument.nArgs.equals("+") && token.value().isEmpty()){
+            throw new ValidationException("Too few arguments");
+        }
 
         // Validate its range
         validateObjectRange(argument);
@@ -93,8 +101,31 @@ public class Validator {
         }
     }
 
-    private static void validateFlag(ArgToken token, Argument argument) throws ValidationException {
-        throw new NotImplementedException("validate flag not done");
+    private void validateFlag(ArgToken token) throws ValidationException {
+        var name = token.name();
+        if(consumedArguments.contains(name)) { throw new ValidationException("Duplicate definition for " + name + "."); }
+
+        Argument<?> argument = null;
+        for (var arg : arguments) {
+            if (Arrays.asList(arg.names).contains(name)) {
+                argument = arg;
+                break;
+            }
+        }
+        if (argument == null) { throw new ValidationException("No such argument " + name + " found."); }
+        for(var val : token.value()){
+            if(!val.getClass().equals(argument.type))
+            { throw new ValidationException("Got type " + token.value().getFirst().getClass() + ", expected " + argument.type.toString()); }
+        }
+
+        if(argument.nArgs.equals("?") && token.value().size() >= 2){
+            throw new ValidationException("Too many arguments");
+        }
+        if(argument.nArgs.equals("+") && token.value().isEmpty()){
+            throw new ValidationException("Too few arguments");
+        }
+
+        consumedArguments.add(name);
     }
 
 }

@@ -132,25 +132,21 @@ public class Scenarios {
                 .setHelpMessage("Pass in strings to validate if ? operation correct")
                 .build());
         parser.parse(arguments); //if fails, will throw validateException
-        List<Object> res = new ArrayList<Object>(parser.getArgument("positional").getValue());
+        List<Object> res = new ArrayList<Object>(parser.getArgument("flag").getValue());
         return Map.of("flag", res);
     }
 
 
     static Map<String, List<Object>> flagNArgsPlus(String arguments) throws ValidationException {
         ArgumentParser parser = new ArgumentParser("flagNArgsPlus", "testing functionality of flag with + args");
-        parser.addArgument(new ArgumentBuilder<>(BigInteger.class, "flag", "flag", "-f", "--flag")
+        parser.addArgument(new ArgumentBuilder<>(String.class, "flag", "-f", "--flag")
                 .setPositional(false)
                 .setRequired(true)
                 .setNArgs("+")
                 .setHelpMessage("Pass in strings to validate if + operation correct")
                 .build());
 
-        try {parser.parse(arguments);} //if fails, will throw validateException
-        catch (ValidationException e) {
-            System.out.println(e.toString());
-            parser.invokeHelp();
-        }
+        parser.parse(arguments);
         List<Object> res = new ArrayList<Object>(parser.getArgument("flag").getValue());
         return Map.of("flag", res);
     }
@@ -165,7 +161,7 @@ public class Scenarios {
                 .build());
 
         parser.parse(arguments); //if fails, will throw validateException
-        List<Object> res = new ArrayList<Object>(parser.getArgument("positional").getValue());
+        List<Object> res = new ArrayList<Object>(parser.getArgument("flag").getValue());
         return Map.of("flag", res);
     }
 
@@ -180,8 +176,8 @@ public class Scenarios {
                 .build());
 
         parser.parse(arguments); //if fails, will throw validateException
-        List<Object> res = new ArrayList<Object>(parser.getArgument("positional").getValue());
-        return Map.of("positional", res);
+        List<Object> res = new ArrayList<Object>(parser.getArgument("flag").getValue());
+        return Map.of("flag", res);
     }
     static Map<String, List<Object>> positionalNArgsPlus(String arguments) throws ValidationException {
         ArgumentParser parser = new ArgumentParser("positionalNArgQuestion", "testing functionality of positional with + args");
