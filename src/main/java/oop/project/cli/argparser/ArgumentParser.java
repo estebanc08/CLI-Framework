@@ -3,6 +3,7 @@ package oop.project.cli.argparser;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class ArgumentParser {
     private final String programName;
@@ -88,7 +89,12 @@ public class ArgumentParser {
      */
     private void validate(ArrayList<ArgToken> tokens, MappedData data) throws ArgParseException {
         var v = new Validator(arguments);
-        v.validate(tokens);
+        try {
+            v.validate(tokens);
+        } catch (ArgParseException e) {
+            invokeHelp();
+            throw e;
+        }
     }
 
     public void invokeHelp() {
@@ -102,7 +108,7 @@ public class ArgumentParser {
                 positionals.append("[").append(name).append(": ").append(value.type.getSimpleName()).append("] ");
             }else{
                 if(!value.required){
-                    optional++;
+                    if (!value.ref.equals("help")) { optional++; }
                     continue;
                 }
                 var name = value.helpName == null ? value.names[0] : value.helpName;
