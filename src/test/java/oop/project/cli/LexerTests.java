@@ -168,7 +168,7 @@ public class LexerTests {
                 throw new RuntimeException(e);
             }
         } else {
-            Assertions.assertThrows(ParseException.class, () -> {
+            Assertions.assertThrows(ArgParseException.class, () -> {
                 new Lexer(command).lex();
             });
         }
